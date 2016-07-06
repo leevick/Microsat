@@ -16,12 +16,13 @@ namespace Microsat.Shared
 {
     public static class Delegationgs
     {
-        public delegate void DoubleToVoidDelegate(double d,ProgressBar bar);
+        public delegate void DoubleToVoidDelegate(double d, ProgressBar bar);
     }
 
     public static class Variables
     {
         public static string str_FilePath;
+        public static List<ScreenParams> Screens=new List<ScreenParams>();
 
         public struct OperaFile
         {
@@ -42,7 +43,7 @@ namespace Microsat.Shared
 
         public static byte[] bufferImgDisp;
 
-        
+
 
 
         /*-----------------------------------------------图像常量------------------------------------------------------*/
@@ -80,20 +81,45 @@ namespace Microsat.Shared
         public static DataSet dataReport = new DataSet("数据报表库");               //数据报表库
         public static DataTable dataErrSum = dataReport.Tables.Add("错误汇总");     //错误汇总表
         public static DataTable dataErrDetail = dataReport.Tables.Add("错误细则");  //错误细则表
-        public static string dbPath = Environment.CurrentDirectory+ "\\db.mdb";     //数据库文件地址
+        public static string dbPath = Environment.CurrentDirectory + "\\db.mdb";     //数据库文件地址
         public static string dbConString = "Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + dbPath;//数据库连接字符串
 
 
         public static long cntErrHead = 0;  //帧头错误数
         public static long cntErrTail = 0;  //帧尾错误数
         public static long cntErrSum = 0;   //校验和错误数
-        public static string str_pathWork=Environment.CurrentDirectory+"\\Work";
+        public static string str_pathWork = Environment.CurrentDirectory + "\\Work";
         /*-------------------------------------------------数据库------------------------------------------------------*/
         public static System.Drawing.Rectangle[] Screen_Locations;
         public static DataTable dt = new DataTable();
 
         public static string MapPath = @"D:\Amap\Amap.html";
     }
+
+    public class ScreenParams
+    {
+        ScreenType Type;
+        public double Width;
+        public double Height;
+        public double X;
+        public double Y;
+        public string Name;
+        public bool Primary;
+
+        public ScreenParams(Rectangle workingArea, string deviceName, bool primary)
+        {
+            this.Width = workingArea.Width;
+            this.Height = workingArea.Height;
+            this.X = workingArea.X;
+            this.Y = workingArea.Y;
+            this.Name = deviceName;
+            this.Primary = primary;
+            if (Height > Width) Type = ScreenType.Portrait;
+            else Type = ScreenType.Landscape;
+
+        }
+    }
+    public enum ScreenType {Landscape,Portrait };
 
     public static class Functions
     {

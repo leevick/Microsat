@@ -786,7 +786,7 @@ namespace Microsat.BackgroundTasks
                         Parallel.For(0, 160, i => {
                             Parallel.For(0, 512, j =>
                             {
-                                Spectra2RGB.HsvToRgb((double)i/160*360,1,(double)buf_file[1024*i+2*j]/255,out buf_full[8192*i+2048*k+4*j], out buf_full[8192 * i + 2048 * k + 4 * j+1], out buf_full[8192 * i + 2048 * k + 4 * j+2]);
+                                Spectra2RGB.HsvToRgb((double)i/160*360, (double)buf_file[1024 * i + 2 * j] / 255,1,out buf_full[8192*i+2048*k+4*j], out buf_full[8192 * i + 2048 * k + 4 * j+1], out buf_full[8192 * i + 2048 * k + 4 * j+2]);
                             });
                         });
                     });

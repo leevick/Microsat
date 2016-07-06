@@ -20,18 +20,10 @@ namespace Microsat
 
         private void Application_Startup(object sender, StartupEventArgs e)
         {
-            
-            
             #region 设定屏幕属性
-            Variables.Screen_Locations = new System.Drawing.Rectangle[2];
-            Variables.Screen_Locations[0] = System.Windows.Forms.Screen.AllScreens[0].WorkingArea;
             foreach (System.Windows.Forms.Screen s in System.Windows.Forms.Screen.AllScreens)
             {
-                if (s.WorkingArea.Width == 3840)
-                {
-                    Variables.Screen_Locations[1] = s.WorkingArea;
-
-                }
+                Variables.Screens.Add(new ScreenParams(s.WorkingArea,s.DeviceName,s.Primary));
             }
 
             #endregion
