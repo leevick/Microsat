@@ -34,18 +34,6 @@
                     </d3:ChartPlotter>
                     <TextBox Margin="126,130,0,0" TextWrapping="Wrap" Text="平均值：128" IsEnabled="False" VerticalAlignment="Top" d:LayoutOverrides="VerticalAlignment" FontSize="32" HorizontalAlignment="Left"/>
                 </Grid>
-          
-
-                <Viewport3D x:Name="vp3d" Height="1064.5" VerticalAlignment="Bottom" MouseMove="Viewport3D_MouseMove" MouseLeftButtonDown="Viewport3D_MouseLeftButtonDown" MouseWheel="Viewport3D_MouseWheel" Cursor="Hand">
-                    <Viewport3D.Camera>
-                        <PerspectiveCamera Position="2000,2000,2000" LookDirection="-1 -1 -1" FieldOfView="75" UpDirection="-1 1 -1" x:Name="camera"/>
-                    </Viewport3D.Camera>
-                    <ModelVisual3D x:Name="light">
-                        <ModelVisual3D.Content>
-                            <AmbientLight />
-                        </ModelVisual3D.Content>
-                    </ModelVisual3D>
-                </Viewport3D>
             </StackPanel>
         </StackPanel>
     </Grid>

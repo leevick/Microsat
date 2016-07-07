@@ -1014,16 +1014,16 @@ namespace Microsat.BackgroundTasks
             return Task.Run(()=>
             {
 
-                System.Windows.Point[] result = new System.Windows.Point[160];
+                System.Windows.Point[] result = new System.Windows.Point[149];
                 FileStream fs = new FileStream($"{Variables.str_pathWork}\\{importId}_{(int)(frmCnt_Start + p.Y * (frmCnt_End - frmCnt_Start))}_{(int)(p.X*2048)/512+1}.raw", FileMode.Open, FileAccess.Read, FileShare.Read);
                 byte[] buf = new byte[512 * 160 * 2];
                 fs.Read(buf, 0, 512 * 160 * 2);
                 int col = (int)(p.X*2048)%512;
                 double[] spec_nm = DataProc.GetWaveLen(col);
 
-                Parallel.For(0, 160, i =>
+                Parallel.For(5, 154, i =>
                 {
-                    result[i] = new System.Windows.Point(spec_nm[i], DataProc.readU16(buf, i * 1024 + 2 * col));
+                    result[i-5] = new System.Windows.Point(spec_nm[i], DataProc.readU16(buf, i * 1024 + 2 * col));
 
                 });
 
