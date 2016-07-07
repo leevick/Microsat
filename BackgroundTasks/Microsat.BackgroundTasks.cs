@@ -10,7 +10,7 @@ using System.IO;
 using Microsat.DB;
 using System.Data.OleDb;
 using System.Data;
-using FreeImageAPI;
+//using FreeImageAPI;
 using System.Runtime.InteropServices;
 using System.Drawing;
 using System.Windows.Threading;
@@ -18,6 +18,7 @@ using System.Drawing.Imaging;
 using System.Windows;
 using Microsat.SpecProc;
 using System.Windows.Media.Imaging;
+using FreeImageAPI;
 
 namespace Microsat.BackgroundTasks
 {
@@ -719,7 +720,7 @@ namespace Microsat.BackgroundTasks
                 Bitmap[] r = new Bitmap[6];
                 Thread _tTop = new Thread(new ThreadStart(() => {
                     Bitmap bmpTop = new Bitmap(2048, dt_Result.Rows.Count);
-                    BitmapData bmpData = bmpTop.LockBits(new Rectangle(0, 0, 2048, dt_Result.Rows.Count), System.Drawing.Imaging.ImageLockMode.WriteOnly, bmpTop.PixelFormat);
+                    BitmapData bmpData = bmpTop.LockBits(new System.Drawing.Rectangle(0, 0, 2048, dt_Result.Rows.Count), System.Drawing.Imaging.ImageLockMode.WriteOnly, bmpTop.PixelFormat);
                     byte[] buf_full = new byte[2048 * dt_Result.Rows.Count * 4];
                     Parallel.For(0, dt_Result.Rows.Count, (i) => {
                         byte[] buf_rgb = new byte[2048 * 4];
@@ -745,7 +746,7 @@ namespace Microsat.BackgroundTasks
                 }));
                 Thread _tBottom = new Thread(new ThreadStart(() => {
                     Bitmap bmpBottom = new Bitmap(2048, dt_Result.Rows.Count);
-                    BitmapData bmpData = bmpBottom.LockBits(new Rectangle(0, 0, 2048, dt_Result.Rows.Count), System.Drawing.Imaging.ImageLockMode.WriteOnly, bmpBottom.PixelFormat);
+                    BitmapData bmpData = bmpBottom.LockBits(new System.Drawing.Rectangle(0, 0, 2048, dt_Result.Rows.Count), System.Drawing.Imaging.ImageLockMode.WriteOnly, bmpBottom.PixelFormat);
                     byte[] buf_full = new byte[2048 * dt_Result.Rows.Count * 4];
                     Parallel.For(0, dt_Result.Rows.Count, (i) => {
                         byte[] buf_rgb = new byte[2048 * 4];
@@ -771,7 +772,7 @@ namespace Microsat.BackgroundTasks
                 }));
                 Thread _tUp = new Thread(new ThreadStart(() => {
                     Bitmap bmpUp = new Bitmap(2048, 160);
-                    BitmapData bmpData = bmpUp.LockBits(new Rectangle(0, 0, 2048, 160), System.Drawing.Imaging.ImageLockMode.WriteOnly, bmpUp.PixelFormat);
+                    BitmapData bmpData = bmpUp.LockBits(new System.Drawing.Rectangle(0, 0, 2048, 160), System.Drawing.Imaging.ImageLockMode.WriteOnly, bmpUp.PixelFormat);
                     byte[] buf_full = new byte[2048 * 160 * 4];
                     
                     Parallel.For(0, 4, k =>

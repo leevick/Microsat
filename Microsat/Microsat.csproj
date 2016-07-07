@@ -199,6 +199,10 @@
     <Resource Include="Resources\Image_Logo_CAS.png" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\FreeImage.NET\Library\FreeImageDotNet.csproj">
+      <Project>{6598a7cd-8f27-4d3f-a675-5ae63113a7c3}</Project>
+      <Name>FreeImageDotNet</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\WFTools3D\WFTools3D\WFTools3D.csproj">
       <Project>{4f58d960-50f3-434f-b2b0-c9ed67151485}</Project>
       <Name>WFTools3D</Name>
