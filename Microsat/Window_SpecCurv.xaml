@@ -14,6 +14,7 @@
         <StackPanel Orientation="Horizontal">
             <Grid Width="1916" Cursor="Cross">
                 <TextBlock x:Name="textBlock" HorizontalAlignment="Center" TextWrapping="Wrap" Text="光谱图像" VerticalAlignment="Center" FontSize="288" Opacity="0.1"/>
+                
                 <ScrollViewer>
                     <Image x:Name="image" HorizontalAlignment="Center" VerticalAlignment="Center" d:LayoutOverrides="LeftMargin, RightMargin, TopMargin, BottomMargin" MouseLeftButtonUp="image_MouseLeftButtonUp"/>
                 </ScrollViewer>

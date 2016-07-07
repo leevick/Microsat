@@ -6,7 +6,22 @@
              xmlns:local="clr-namespace:Microsat"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
-    <Grid>
-            
+    <Grid x:Name="grid_Image" Width="auto" Height="auto" Background="Black">
+        <Grid.Resources>
+            <TransformGroup x:Key="Imageview">
+                <ScaleTransform/>
+                <TranslateTransform/>
+            </TransformGroup>
+        </Grid.Resources>
+        <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Disabled" Background="Wheat"   Cursor="Cross"
+                  Margin="5" Focusable="False" x:Name="BackFrame">
+            <ContentControl  MouseLeftButtonDown="IMG1_MouseLeftButtonDown"   
+                             MouseLeftButtonUp="IMG1_MouseLeftButtonUp"
+                             MouseMove="IMG1_MouseMove"
+                             MouseWheel="IMG1_MouseWheel" >
+                <Image Name="IMG1" RenderTransform="{StaticResource Imageview}" RenderOptions.BitmapScalingMode="NearestNeighbor" MouseDown="IMG1_MouseDown" StretchDirection="DownOnly"/>
+            </ContentControl>
+        </ScrollViewer>
+        <TextBox x:Name="txtPosi" Height="23" TextWrapping="Wrap" Text="TextBox" Margin="10,10,0,0" VerticalAlignment="Top" HorizontalAlignment="Left"/>
     </Grid>
 </UserControl>

@@ -41,7 +41,6 @@ namespace Microsat
             this.Top = rectangle.Y;
             this.Left = rectangle.X;
             initChart();
-            
         }
 
         #region 光谱曲线图
