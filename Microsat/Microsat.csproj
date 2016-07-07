@@ -104,31 +104,46 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Ctrl_ImageView.xaml.cs">
-      <DependentUpon>Ctrl_ImageView.xaml</DependentUpon>
+    <Compile Include="UserControls\Ctrl_3DView.xaml.cs">
+      <DependentUpon>Ctrl_3DView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Window_3DCube.xaml.cs">
+    <Compile Include="UserControls\Ctrl_ImageView.xaml.cs">
+      <DependentUpon>Ctrl_ImageView.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="UserControls\Ctrl_SpecCurv.xaml.cs">
+      <DependentUpon>Ctrl_SpecCurv.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\Window_3DCube.xaml.cs">
       <DependentUpon>Window_3DCube.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Window_Map.xaml.cs">
+    <Compile Include="Windows\Window_Map.xaml.cs">
       <DependentUpon>Window_Map.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Window_SpecCurv.xaml.cs">
+    <Compile Include="Windows\Window_SpecCurv.xaml.cs">
       <DependentUpon>Window_SpecCurv.xaml</DependentUpon>
     </Compile>
-    <Page Include="Ctrl_ImageView.xaml">
+    <Page Include="UserControls\Ctrl_3DView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserControls\Ctrl_ImageView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserControls\Ctrl_SpecCurv.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Themes\Generic.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Window_3DCube.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Window_Main.xaml">
+    <Page Include="Windows\Window_3DCube.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Windows\Window_Main.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -141,15 +156,15 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="Window_Main.xaml.cs">
+    <Compile Include="Windows\Window_Main.xaml.cs">
       <DependentUpon>Window_Main.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="Window_Map.xaml">
+    <Page Include="Windows\Window_Map.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Window_SpecCurv.xaml">
+    <Page Include="Windows\Window_SpecCurv.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -184,6 +199,10 @@
     <Resource Include="Resources\Image_Logo_CAS.png" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\WFTools3D\WFTools3D\WFTools3D.csproj">
+      <Project>{4f58d960-50f3-434f-b2b0-c9ed67151485}</Project>
+      <Name>WFTools3D</Name>
+    </ProjectReference>
     <ProjectReference Include="..\BackgroundTasks\Microsat.BackgroundTasks.csproj">
       <Project>{7c71ee24-102b-4c5c-b2b9-50448a6c8759}</Project>
       <Name>Microsat.BackgroundTasks</Name>
@@ -194,8 +213,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="folder-12.png" />
+    <Resource Include="Images\folder-12.png" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

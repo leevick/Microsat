@@ -8,14 +8,14 @@
         xmlns:local="clr-namespace:Microsat"
         xmlns:System="clr-namespace:System;assembly=mscorlib" x:Name="Win_Main" x:Class="Microsat.MainWindow"
         mc:Ignorable="d"
-        Title="MainWindow" Height="1080" Width="1920" ResizeMode="NoResize" ScrollViewer.VerticalScrollBarVisibility="Disabled" WindowStartupLocation="CenterScreen" Icon="Resources/Flat-Icons.com-Flat-Satellite.ico" WindowStyle="None" Closed="Win_Main_Closed" WindowState="Maximized" >
+        Title="MainWindow" Height="1080" Width="1920" ResizeMode="NoResize" ScrollViewer.VerticalScrollBarVisibility="Disabled" WindowStartupLocation="CenterScreen" Icon="../Resources/Flat-Icons.com-Flat-Satellite.ico" WindowStyle="None" Closed="Win_Main_Closed" WindowState="Maximized" >
     <Window.Resources>
         <System:Double x:Key="prog_CompSplit">0</System:Double>
 
     </Window.Resources>
     <Grid Width="1920" ScrollViewer.VerticalScrollBarVisibility="Disabled" Margin="0" Height="1080">
 
-        <Image x:Name="image" Source="Resources/Image_BackGround.jpg">
+        <Image x:Name="image" Source="../Resources/Image_BackGround.jpg">
             <Image.Effect>
                 <BlurEffect/>
             </Image.Effect>
@@ -287,7 +287,7 @@
         <Grid VerticalAlignment="Top" Opacity="0.7" Margin="834,0,0,0" Background="White" d:LayoutOverrides="HorizontalAlignment" Height="102">
             <TextBlock x:Name="textBlock" VerticalAlignment="Center" Text="光谱微纳卫星数据分析系统" TextWrapping="Wrap" Margin="120,22.32,121,26.68" Height="43" HorizontalAlignment="Right" FontSize="32"/>
             <Button x:Name="button_Exit" Width="100" Padding="1" Margin="0" HorizontalAlignment="Right" FontSize="32" Content="退出" Click="button_Exit_Click" Background="{x:Null}"/>
-            <Image x:Name="image1" Width="90" VerticalAlignment="Bottom" Stretch="Fill" Opacity="1" Margin="0,0,522,4" Height="90" HorizontalAlignment="Right" Source="Resources/Image_Logo_CAS.png"/>
+            <Image x:Name="image1" Width="90" VerticalAlignment="Bottom" Stretch="Fill" Opacity="1" Margin="0,0,522,4" Height="90" HorizontalAlignment="Right" Source="../Resources/Image_Logo_CAS.png"/>
         </Grid>
     </Grid>
 </Window>

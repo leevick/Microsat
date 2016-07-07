@@ -15,10 +15,10 @@
         </Grid.Resources>
         <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Disabled" Background="Wheat"   Cursor="Cross"
                   Margin="5" Focusable="False" x:Name="BackFrame">
-            <ContentControl  MouseLeftButtonDown="IMG1_MouseLeftButtonDown"   
+            <ContentControl   
                              MouseLeftButtonUp="IMG1_MouseLeftButtonUp"
                              MouseMove="IMG1_MouseMove"
-                             MouseWheel="IMG1_MouseWheel" >
+                             MouseWheel="IMG1_MouseWheel" MouseLeftButtonDown="IMG1_MouseLeftButtonDown" >
                 <Image Name="IMG1" RenderTransform="{StaticResource Imageview}" RenderOptions.BitmapScalingMode="NearestNeighbor" MouseDown="IMG1_MouseDown" StretchDirection="DownOnly"/>
             </ContentControl>
         </ScrollViewer>

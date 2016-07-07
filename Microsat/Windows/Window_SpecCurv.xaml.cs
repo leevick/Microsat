@@ -41,6 +41,7 @@ namespace Microsat
             this.Top = rectangle.Y;
             this.Left = rectangle.X;
             initChart();
+            
         }
 
         #region 光谱曲线图
@@ -78,6 +79,16 @@ namespace Microsat
             bmpSource.StreamSource = ms;
             bmpSource.EndInit();
             this.image.Source = bmpSource;
+            this.Stack_Right.Children.Add(new Ctrl_ImageView(bmp[0]));
+            foreach (object o in Stack_Right.Children)
+            {
+                if (o is Ctrl_ImageView)
+                {
+                    ((Ctrl_ImageView)(o)).grid_Image.Height = this.Stack_Right.ActualHeight / 2;
+                }
+            }
+
+
         }
         private async void image_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {

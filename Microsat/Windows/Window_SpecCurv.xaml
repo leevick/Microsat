@@ -19,7 +19,7 @@
                     <Image x:Name="image" HorizontalAlignment="Center" VerticalAlignment="Center" d:LayoutOverrides="LeftMargin, RightMargin, TopMargin, BottomMargin" MouseLeftButtonUp="image_MouseLeftButtonUp"/>
                 </ScrollViewer>
             </Grid>
-            <StackPanel Width="1916">
+            <StackPanel Name="Stack_Right" Width="1916">
                 <Grid HorizontalAlignment="Right" Width="1916" Height="1064.5" Margin="0">
                     <d3:ChartPlotter x:Name="chart1st" Margin="0" Opacity="0.8" Background="Black" Foreground="#FF998F8F" BorderBrush="White" Height="1064.5" VerticalAlignment="Top" FontSize="32">
                         <d3:ChartPlotter.HorizontalAxis>
@@ -28,13 +28,13 @@
                         <d3:ChartPlotter.VerticalAxis>
                             <d3:VerticalAxis x:Name="Ychart1st"/>
                         </d3:ChartPlotter.VerticalAxis>
-
                         <d3:Header FontFamily="Arial" Content="光谱曲线" FontSize="64" Margin="0,5"/>
                         <d3:HorizontalAxisTitle Content="谱段" FontSize="64"/>
                         <d3:VerticalAxisTitle Content="值" FontSize="64"/>
                     </d3:ChartPlotter>
                     <TextBox Margin="126,130,0,0" TextWrapping="Wrap" Text="平均值：128" IsEnabled="False" VerticalAlignment="Top" d:LayoutOverrides="VerticalAlignment" FontSize="32" HorizontalAlignment="Left"/>
                 </Grid>
+                
             </StackPanel>
         </StackPanel>
     </Grid>

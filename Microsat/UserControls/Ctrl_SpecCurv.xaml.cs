@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -17,30 +16,13 @@ using System.Windows.Shapes;
 namespace Microsat
 {
     /// <summary>
-    /// Ctrl_ImageView.xaml 的交互逻辑
+    /// Ctrl_SpecCurv.xaml 的交互逻辑
     /// </summary>
-    public partial class Ctrl_ImageView : UserControl
+    public partial class Ctrl_SpecCurv : UserControl
     {
-        /// <summary>
-        /// 图片名称
-        /// </summary>
-        public string Title;
-
-        public Ctrl_ImageView()
+        public Ctrl_SpecCurv()
         {
             InitializeComponent();
         }
-        public Ctrl_ImageView(string title)
-        {
-            InitializeComponent();
-        }
-
-        public Ctrl_ImageView(string title,Bitmap bmp)
-        {
-            InitializeComponent();
-           // this.IMG1.Source = bmp;
-        }
-
-     
     }
 }
