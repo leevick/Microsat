@@ -71,6 +71,7 @@ namespace Microsat
 
         #region 数据分析显示界面
 
+        #region 局部变量
         public DateTime start_time; //起始检索时刻
         public DateTime end_time;   //终止检索时刻
         public Coord Coord_TL = new Coord(0,0);      //左上角坐标
@@ -78,18 +79,9 @@ namespace Microsat
         public long start_FrmCnt;   //起始帧号
         public long end_FrmCnt;     //终止帧号
         DataTable dt_Result=new DataTable();        //结果
+        #endregion
 
- 
-
-        private void Time_Changed(object sender, TextChangedEventArgs e)
-        {
-            
-        }
-
-        private void Coord_Changed(object sender, TextChangedEventArgs e)
-        {
-             
-        }
+        #region 界面控制按钮
         private async void b_Query_Click(object sender, RoutedEventArgs e)
         {
             try
@@ -102,38 +94,44 @@ namespace Microsat
             {
                 System.Windows.MessageBox.Show(E.Message);
             }
-          
+
             System.Windows.MessageBox.Show("显示完成！");
-        }
-
-        #endregion
-
-        private void b_WorkPathBrowse_Click(object sender, RoutedEventArgs e)
-        {
-            
         }
         private void button_Exit_Click(object sender, RoutedEventArgs e)
         {
             this.Close();
         }
-
         private async void b_Find_Click(object sender, RoutedEventArgs e)
         {
-            DataTable dt = await  DataProc.QueryResult();
+            DataTable dt = await DataProc.QueryResult();
             this.dataGrid.ItemsSource = dt.DefaultView;
-                System.Windows.MessageBox.Show("显示完成！");
+            System.Windows.MessageBox.Show("显示完成！");
         }
         private void button_Display_Click(object sender, RoutedEventArgs e)
         {
 
             DataTable dt = this.dt_Result;
-
             App.global_Win_Map.Show();
             App.global_Win_Map.DrawRectangle(new Point((double)dt_Result.Rows[0].ItemArray[3], (double)dt_Result.Rows[0].ItemArray[4]), new Point((double)dt_Result.Rows[dt_Result.Rows.Count - 1].ItemArray[3], (double)dt_Result.Rows[dt_Result.Rows.Count - 1].ItemArray[4]));
-            App.global_Win_ImageShow.Refresh(dt);
-            App.global_Win_ImageShow.Show();
+            //App.global_Win_ImageShow.Refresh(dt);
+            //App.global_Win_ImageShow.Show();
+            App.global_Win_3DCube.Show();
+            App.global_Win_3DCube.Refresh(dt);
+            
         }
+        private void Win_Main_Closed(object sender, EventArgs e)
+        {
+            Environment.Exit(0);
+        }
+        private void button_Clear_Result_Click(object sender, RoutedEventArgs e)
+        {
+            dt_Result.Clear();
+            dataGrid_Result.ItemsSource = null;
 
+        }
+        #endregion
+
+        #region 查询条件设定
         private void dtp_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
             DateTimePicker dp = sender as DateTimePicker;
@@ -144,14 +142,11 @@ namespace Microsat
                 default: break;
             }
         }
+
         private void tb_frm_TextChanged(object sender, TextChangedEventArgs e)
         {
-               long.TryParse(this.tb_start_frm.Text,out start_FrmCnt);
-               long.TryParse(this.tb_end_frm.Text, out end_FrmCnt);
-        }
-        private void Win_Main_Closed(object sender, EventArgs e)
-        {
-            Environment.Exit(0);
+            long.TryParse(this.tb_start_frm.Text, out start_FrmCnt);
+            long.TryParse(this.tb_end_frm.Text, out end_FrmCnt);
         }
 
         private void DDMMSS_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
@@ -173,8 +168,8 @@ namespace Microsat
         private void DDMMSS_GetValue()
         {
             tb_TL_lat_DDMMSS_DD.Value = (int)Coord_TL.Lat;
-            tb_TL_lat_DDMMSS_MM.Value = (int)((Coord_TL.Lat*60)- (int)Coord_TL.Lat * 60);
-            tb_TL_lat_DDMMSS_SS.Value =(int) (Coord_TL.Lat*3600- ((int)((Coord_TL.Lat * 60) - (int)Coord_TL.Lat * 60))*60- (int)Coord_TL.Lat*3600);
+            tb_TL_lat_DDMMSS_MM.Value = (int)((Coord_TL.Lat * 60) - (int)Coord_TL.Lat * 60);
+            tb_TL_lat_DDMMSS_SS.Value = (int)(Coord_TL.Lat * 3600 - ((int)((Coord_TL.Lat * 60) - (int)Coord_TL.Lat * 60)) * 60 - (int)Coord_TL.Lat * 3600);
             tb_TL_lon_DDMMSS_DD.Value = (int)Coord_TL.Lon;
             tb_TL_lon_DDMMSS_MM.Value = (int)(Coord_TL.Lon * 60) - (int)Coord_TL.Lon * 60;
             tb_TL_lon_DDMMSS_SS.Value = (int)(Coord_TL.Lon * 3600 - ((int)((Coord_TL.Lon * 60) - (int)Coord_TL.Lon * 60)) * 60 - (int)Coord_TL.Lon * 3600);
@@ -201,7 +196,7 @@ namespace Microsat
         private void DD_GetValue()
         {
             tb_TL_lat_DD_DD.Value = Coord_TL.Lat;
-           
+
             tb_TL_lon_DD_DD.Value = Coord_TL.Lon;
 
             tb_DR_lat_DD_DD.Value = Coord_DR.Lat;
@@ -219,7 +214,7 @@ namespace Microsat
 
         private void DDMM_SetValue()
         {
-            Coord_TL.Lat = (double)tb_TL_lat_DDMM_DD.Value + (double)tb_TL_lat_DDMM_MM.Value / 60 ;
+            Coord_TL.Lat = (double)tb_TL_lat_DDMM_DD.Value + (double)tb_TL_lat_DDMM_MM.Value / 60;
             Coord_TL.Lon = (double)tb_TL_lon_DDMM_DD.Value + (double)tb_TL_lon_DDMM_MM.Value / 60;
 
             Coord_DR.Lat = (double)tb_DR_lat_DDMM_DD.Value + (double)tb_DR_lat_DDMM_MM.Value / 60;
@@ -228,8 +223,8 @@ namespace Microsat
 
         private void DD_SetValue()
         {
-            Coord_TL.Lat = (double)tb_TL_lat_DD_DD.Value ;
-            Coord_TL.Lon = (double)tb_TL_lon_DD_DD.Value ;
+            Coord_TL.Lat = (double)tb_TL_lat_DD_DD.Value;
+            Coord_TL.Lon = (double)tb_TL_lon_DD_DD.Value;
 
             Coord_DR.Lat = (double)tb_DR_lat_DD_DD.Value;
             Coord_DR.Lon = (double)tb_DR_lon_DD_DD.Value;
@@ -248,7 +243,8 @@ namespace Microsat
                         DDMM_SetValue();
                         DD_SetValue();
                         DDMMSS_SetTrigger();
-                    } break;
+                    }
+                    break;
                 case 1:
                     {
                         DDMMSS_UnsetTrigger();
@@ -258,7 +254,8 @@ namespace Microsat
                         DDMM_SetValue();
                         DDMMSS_SetValue();
                         DD_SetTrigger();
-                    } break;
+                    }
+                    break;
                 case 2:
                     {
                         DDMMSS_UnsetTrigger();
@@ -269,8 +266,9 @@ namespace Microsat
                         DD_SetValue();
                         DDMM_SetTrigger();
 
-                    } break;
-                default:break;
+                    }
+                    break;
+                default: break;
             }
         }
 
@@ -281,24 +279,24 @@ namespace Microsat
 
         private void Grid_Loaded(object sender, RoutedEventArgs e)
         {
-            
+
         }
 
 
         private void DDMMSS_SetTrigger()
         {
-            this.tb_TL_lat_DDMMSS_DD.ValueChanged +=DDMMSS_ValueChanged;
-            this.tb_TL_lon_DDMMSS_MM.ValueChanged +=DDMMSS_ValueChanged;
-            this.tb_TL_lat_DDMMSS_SS.ValueChanged +=DDMMSS_ValueChanged;
-            this.tb_TL_lon_DDMMSS_DD.ValueChanged +=DDMMSS_ValueChanged;
-            this.tb_TL_lat_DDMMSS_MM.ValueChanged +=DDMMSS_ValueChanged;
-            this.tb_TL_lon_DDMMSS_SS.ValueChanged +=DDMMSS_ValueChanged;
-            this.tb_DR_lat_DDMMSS_DD.ValueChanged +=DDMMSS_ValueChanged;
-            this.tb_DR_lon_DDMMSS_MM.ValueChanged +=DDMMSS_ValueChanged;
-            this.tb_DR_lat_DDMMSS_SS.ValueChanged +=DDMMSS_ValueChanged;
-            this.tb_DR_lon_DDMMSS_DD.ValueChanged +=DDMMSS_ValueChanged;
-            this.tb_DR_lat_DDMMSS_MM.ValueChanged +=DDMMSS_ValueChanged;
-            this.tb_DR_lon_DDMMSS_SS.ValueChanged +=DDMMSS_ValueChanged;
+            this.tb_TL_lat_DDMMSS_DD.ValueChanged += DDMMSS_ValueChanged;
+            this.tb_TL_lon_DDMMSS_MM.ValueChanged += DDMMSS_ValueChanged;
+            this.tb_TL_lat_DDMMSS_SS.ValueChanged += DDMMSS_ValueChanged;
+            this.tb_TL_lon_DDMMSS_DD.ValueChanged += DDMMSS_ValueChanged;
+            this.tb_TL_lat_DDMMSS_MM.ValueChanged += DDMMSS_ValueChanged;
+            this.tb_TL_lon_DDMMSS_SS.ValueChanged += DDMMSS_ValueChanged;
+            this.tb_DR_lat_DDMMSS_DD.ValueChanged += DDMMSS_ValueChanged;
+            this.tb_DR_lon_DDMMSS_MM.ValueChanged += DDMMSS_ValueChanged;
+            this.tb_DR_lat_DDMMSS_SS.ValueChanged += DDMMSS_ValueChanged;
+            this.tb_DR_lon_DDMMSS_DD.ValueChanged += DDMMSS_ValueChanged;
+            this.tb_DR_lat_DDMMSS_MM.ValueChanged += DDMMSS_ValueChanged;
+            this.tb_DR_lon_DDMMSS_SS.ValueChanged += DDMMSS_ValueChanged;
         }
 
         private void DDMMSS_UnsetTrigger()
@@ -367,11 +365,12 @@ namespace Microsat
             this.tb_DR_lon_DDMM_MM.ValueChanged -= DDMM_ValueChanged;
         }
 
-        private void button_Clear_Result_Click(object sender, RoutedEventArgs e)
-        {
-            dt_Result.Clear();
-            dataGrid_Result.ItemsSource = null;
-            
-        }
+        #endregion
+
+        #endregion
+
+
+
+
     }
 }

@@ -1,0 +1,21 @@
+﻿<Window x:Class="Microsat.Window_3DCube"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Microsat"
+        mc:Ignorable="d"
+        Title="Window_3DCube" Height="300" Width="300" WindowState="Maximized">
+    <Grid>
+        <Viewport3D x:Name="vp3d" MouseMove="Viewport3D_MouseMove" MouseLeftButtonDown="Viewport3D_MouseLeftButtonDown" MouseWheel="Viewport3D_MouseWheel" Cursor="Hand">
+            <Viewport3D.Camera>
+                <PerspectiveCamera Position="2000,2000,2000" LookDirection="-1 -1 -1" FieldOfView="75" UpDirection="-1 1 -1" x:Name="camera"/>
+            </Viewport3D.Camera>
+            <ModelVisual3D x:Name="light">
+                <ModelVisual3D.Content>
+                    <AmbientLight />
+                </ModelVisual3D.Content>
+            </ModelVisual3D>
+        </Viewport3D>
+    </Grid>
+</Window>

@@ -104,12 +104,19 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Window_3DCube.xaml.cs">
+      <DependentUpon>Window_3DCube.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Window_Map.xaml.cs">
       <DependentUpon>Window_Map.xaml</DependentUpon>
     </Compile>
     <Compile Include="Window_SpecCurv.xaml.cs">
       <DependentUpon>Window_SpecCurv.xaml</DependentUpon>
     </Compile>
+    <Page Include="Window_3DCube.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Window_Main.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

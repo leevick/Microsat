@@ -1,7 +1,10 @@
-﻿using Microsoft.Research.DynamicDataDisplay;
-using Microsoft.Research.DynamicDataDisplay.DataSources;
+﻿using Microsat.BackgroundTasks;
+using Microsat.Shared;
 using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,101 +14,35 @@ using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
-using Microsat.Shared;
-using System.Drawing;
-using System.IO;
-using Microsat.BackgroundTasks;
-using System.Data;
 using System.Windows.Media.Animation;
+using System.Windows.Media.Imaging;
 using System.Windows.Media.Media3D;
+using System.Windows.Shapes;
+
 namespace Microsat
 {
     /// <summary>
-    /// Window_SpecCurv.xaml 的交互逻辑
+    /// Window_3DCube.xaml 的交互逻辑
     /// </summary>
-    public partial class Window_SpecCurv : Window
+    public partial class Window_3DCube : Window
     {
+        public Window_3DCube()
+        {
+            InitializeComponent();
+        }
+
+        #region 局部变量区
+        public bool bool_span = false;
+        public System.Windows.Point mouseLastPosition;
+        public double mouseDeltaFactor = 5;
         public int ImportId;
         public int FrmCnt_Start;
         public int FrmCnt_End;
         public int SpecSelected;
         public Coord Start;
         public Coord End;
-        public Window_SpecCurv(System.Drawing.Rectangle rectangle)
-        {
-            InitializeComponent();
-            this.Top = rectangle.Y;
-            this.Left = rectangle.X;
-            initChart();
-        }
-
-        #region 光谱曲线图
-        public int yChart1st = 0;
-        public UInt16[] grayChart1st = new UInt16[128];
-        public ObservableDataSource<System.Windows.Point> dtsChart1st = new ObservableDataSource<System.Windows.Point>();
-        public void initChart()
-        {
-        }
-        public void addData()
-        {
-            Random random = new Random();
-            for (UInt16 j = 0; j < 128; j++)
-                grayChart1st[j] = (UInt16)random.Next(300, 500);
-            System.Windows.Point[] point = new System.Windows.Point[128];
-            for (int i = 0; i < 128; i++)
-            {
-                point[i].X = i + 1;
-                point[i].Y = grayChart1st[i];
-                dtsChart1st.AppendAsync(base.Dispatcher, point[i]);
-            }
-        }
-        public void addData(System.Windows.Point[] points)
-        {
-            chart1st.AddLineGraph(dtsChart1st, Colors.Green, 2);
-            for (int i = 5; i < 154; i++)
-            {
-                dtsChart1st.AppendAsync(base.Dispatcher, points[i]);
-            }
-        }
-        public async void Refresh(DataTable dt_Result)
-        { 
-            Bitmap[] bmp = await DataProc.GetBmp(dt_Result);
-            ImportId =(int) (dt_Result.Rows[0].ItemArray[14]);
-            FrmCnt_Start = int.MaxValue;
-            FrmCnt_End = int.MinValue;
-            
-            foreach (DataRow dr in dt_Result.Rows)
-            {
-                int accountLevel = dr.Field<int>("FrameId");
-                FrmCnt_Start = Math.Min(FrmCnt_Start, accountLevel);
-                FrmCnt_End = Math.Max(FrmCnt_End, accountLevel);
-            }
-            MemoryStream ms = new MemoryStream();
-            bmp[0].Save(ms, System.Drawing.Imaging.ImageFormat.Bmp);
-            BitmapImage bmpSource = new BitmapImage();
-            bmpSource.BeginInit();
-            bmpSource.StreamSource = ms;
-            bmpSource.EndInit();
-            this.image.Source = bmpSource;
-            RenderBox(this.image.Source.Height,bmp);
-        }
-        private async void image_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
-        {
-            System.Windows.Point p = e.GetPosition(this.image);
-            p.X = p.X / this.image.Source.Width;
-            p.Y = p.Y / this.image.Source.Height;
-            this.image.MouseLeftButtonUp -= image_MouseLeftButtonUp;
-            System.Windows.Point[] points = await BackgroundTasks.SpecProc.GetSpecCurv(ImportId,FrmCnt_Start,FrmCnt_End,80,p);
-            addData(points);
-            this.image.MouseLeftButtonUp += image_MouseLeftButtonUp;
-        }
         #endregion
-        #region 3D显示界面
-        public bool bool_span = false;
-        public System.Windows.Point mouseLastPosition;
-        public double mouseDeltaFactor = 5;
+
         #region 旋转与缩放
         private void VerticalTransform(bool upDown, double angleDeltaFactor)
         {
@@ -189,8 +126,11 @@ namespace Microsat
             vp3d.MouseMove += Viewport3D_MouseMove;
             vp3d.MouseWheel += Viewport3D_MouseWheel;
         }
-
-        private void RenderBox(double lines,Bitmap[] bmpArray)
+        private void Viewport3D_KeyDown(object sender, KeyEventArgs e)
+        { }
+        #endregion
+        #region 刷新图像
+        private void RenderBox(double lines, Bitmap[] bmpArray)
         {
             ModelVisual3D mv3d = new ModelVisual3D();
             Model3DGroup m3dg = new Model3DGroup();
@@ -202,9 +142,9 @@ namespace Microsat
             MeshGeometry3D mg3d_Up = new MeshGeometry3D();
             MeshGeometry3D mg3d_Down = new MeshGeometry3D();
             #region 3D立方体正视图
-            mg3d_Top.Positions.Add(new Point3D(0,0,640));
+            mg3d_Top.Positions.Add(new Point3D(0, 0, 640));
             mg3d_Top.Positions.Add(new Point3D(2048, 0, 640));
-            mg3d_Top.Positions.Add(new Point3D(2048,lines,640));
+            mg3d_Top.Positions.Add(new Point3D(2048, lines, 640));
             mg3d_Top.Positions.Add(new Point3D(0, lines, 640));
             mg3d_Top.TriangleIndices.Add(0);
             mg3d_Top.TriangleIndices.Add(1);
@@ -212,7 +152,7 @@ namespace Microsat
             mg3d_Top.TriangleIndices.Add(2);
             mg3d_Top.TriangleIndices.Add(3);
             mg3d_Top.TriangleIndices.Add(0);
-            mg3d_Top.TextureCoordinates.Add(new System.Windows.Point(0,1));
+            mg3d_Top.TextureCoordinates.Add(new System.Windows.Point(0, 1));
             mg3d_Top.TextureCoordinates.Add(new System.Windows.Point(1, 1));
             mg3d_Top.TextureCoordinates.Add(new System.Windows.Point(1, 0));
             mg3d_Top.TextureCoordinates.Add(new System.Windows.Point(0, 0));
@@ -221,7 +161,7 @@ namespace Microsat
             mg3d_Left.Positions.Add(new Point3D(0, 0, 0));
             mg3d_Left.Positions.Add(new Point3D(0, 0, 640));
             mg3d_Left.Positions.Add(new Point3D(0, lines, 640));
-            mg3d_Left.Positions.Add(new Point3D(0, lines,0));
+            mg3d_Left.Positions.Add(new Point3D(0, lines, 0));
             mg3d_Left.TriangleIndices.Add(0);
             mg3d_Left.TriangleIndices.Add(1);
             mg3d_Left.TriangleIndices.Add(2);
@@ -237,7 +177,7 @@ namespace Microsat
             mg3d_Right.Positions.Add(new Point3D(2048, 0, 0));
             mg3d_Right.Positions.Add(new Point3D(2048, lines, 0));
             mg3d_Right.Positions.Add(new Point3D(2048, lines, 640));
-            mg3d_Right.Positions.Add(new Point3D(2048, 0, 640));        
+            mg3d_Right.Positions.Add(new Point3D(2048, 0, 640));
             mg3d_Right.TriangleIndices.Add(0);
             mg3d_Right.TriangleIndices.Add(1);
             mg3d_Right.TriangleIndices.Add(2);
@@ -300,7 +240,7 @@ namespace Microsat
 
 
             BitmapImage[] bmpSource = new BitmapImage[3];
-           
+
             for (int i = 0; i < 3; i++)
             {
                 MemoryStream ms = new MemoryStream();
@@ -315,7 +255,7 @@ namespace Microsat
             DiffuseMaterial dm_Top = new DiffuseMaterial(new System.Windows.Media.ImageBrush(bmpSource[0]));
             DiffuseMaterial dm_Bottom = new DiffuseMaterial(new System.Windows.Media.ImageBrush(bmpSource[1]));
             DiffuseMaterial dm_Up = new DiffuseMaterial(new System.Windows.Media.ImageBrush(bmpSource[2]));
-            GeometryModel3D gm3d_Top = new GeometryModel3D(mg3d_Top,dm_Top);
+            GeometryModel3D gm3d_Top = new GeometryModel3D(mg3d_Top, dm_Top);
             GeometryModel3D gm3d_Left = new GeometryModel3D(mg3d_Left, dm_Top);
             GeometryModel3D gm3d_Right = new GeometryModel3D(mg3d_Right, dm_Top);
             GeometryModel3D gm3d_Bottom = new GeometryModel3D(mg3d_Bottom, dm_Bottom);
@@ -328,17 +268,28 @@ namespace Microsat
             m3dg.Children.Add(gm3d_Up);
             m3dg.Children.Add(gm3d_Down);
             mv3d.Content = m3dg;
-            vp3d.Children.Add(mv3d);  
+            vp3d.Children.Add(mv3d);
         }
-        private void Viewport3D_KeyDown(object sender, KeyEventArgs e)
-        { }
-        #endregion
-        #region 刷新图像
-        #endregion
-        #endregion
-        private void Window_Closed(object sender, EventArgs e)
+        public async void Refresh(DataTable dt_Result)
         {
-            this.Hide();
+            Bitmap[] bmp = await DataProc.GetBmp(dt_Result);
+            ImportId = (int)(dt_Result.Rows[0].ItemArray[14]);
+            FrmCnt_Start = int.MaxValue;
+            FrmCnt_End = int.MinValue;
+            foreach (DataRow dr in dt_Result.Rows)
+            {
+                int accountLevel = dr.Field<int>("FrameId");
+                FrmCnt_Start = Math.Min(FrmCnt_Start, accountLevel);
+                FrmCnt_End = Math.Max(FrmCnt_End, accountLevel);
+            }
+            MemoryStream ms = new MemoryStream();
+            bmp[0].Save(ms, System.Drawing.Imaging.ImageFormat.Bmp);
+            BitmapImage bmpSource = new BitmapImage();
+            bmpSource.BeginInit();
+            bmpSource.StreamSource = ms;
+            bmpSource.EndInit();
+            RenderBox(bmpSource.Height, bmp);
         }
+        #endregion
     }
 }

@@ -14,11 +14,6 @@ using System.Configuration;
 
 namespace Microsat.Shared
 {
-    public static class Delegationgs
-    {
-        public delegate void DoubleToVoidDelegate(double d, ProgressBar bar);
-    }
-
     public static class Variables
     {
         public static string str_FilePath;

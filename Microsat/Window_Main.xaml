@@ -8,7 +8,7 @@
         xmlns:local="clr-namespace:Microsat"
         xmlns:System="clr-namespace:System;assembly=mscorlib" x:Name="Win_Main" x:Class="Microsat.MainWindow"
         mc:Ignorable="d"
-        Title="MainWindow" Height="1080" Width="1920" ResizeMode="NoResize" ScrollViewer.VerticalScrollBarVisibility="Disabled" WindowStartupLocation="Manual" Icon="Resources/Flat-Icons.com-Flat-Satellite.ico" WindowStyle="None" Closed="Win_Main_Closed" >
+        Title="MainWindow" Height="1080" Width="1920" ResizeMode="NoResize" ScrollViewer.VerticalScrollBarVisibility="Disabled" WindowStartupLocation="CenterScreen" Icon="Resources/Flat-Icons.com-Flat-Satellite.ico" WindowStyle="None" Closed="Win_Main_Closed" WindowState="Maximized" >
     <Window.Resources>
         <System:Double x:Key="prog_CompSplit">0</System:Double>
 

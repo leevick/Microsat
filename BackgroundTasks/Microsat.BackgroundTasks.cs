@@ -711,16 +711,12 @@ namespace Microsat.BackgroundTasks
 
 
     */
-
         public static Task<Bitmap[]> GetBmp(DataTable dt_Result)
         {
-
             return Task.Run(() =>
             {
 
                 Bitmap[] r = new Bitmap[6];
-
-
                 Thread _tTop = new Thread(new ThreadStart(() => {
                     Bitmap bmpTop = new Bitmap(2048, dt_Result.Rows.Count);
                     BitmapData bmpData = bmpTop.LockBits(new Rectangle(0, 0, 2048, dt_Result.Rows.Count), System.Drawing.Imaging.ImageLockMode.WriteOnly, bmpTop.PixelFormat);
