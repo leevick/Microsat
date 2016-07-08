@@ -21,6 +21,7 @@ using System.Data;
 using System.Windows.Media.Animation;
 using System.Windows.Media.Media3D;
 using Microsoft.Research.DynamicDataDisplay.PointMarkers;
+using Microsat.UserControls;
 
 namespace Microsat
 {
@@ -79,12 +80,23 @@ namespace Microsat
             bmpSource.StreamSource = ms;
             bmpSource.EndInit();
             this.image.Source = bmpSource;
+            /*
             this.Stack_Right.Children.Add(new Ctrl_ImageView(bmp[0]));
             foreach (object o in Stack_Right.Children)
             {
                 if (o is Ctrl_ImageView)
                 {
                     ((Ctrl_ImageView)(o)).grid_Image.Height = this.Stack_Right.ActualHeight / 2;
+                }
+            }
+            */
+
+            this.Stack_Right.Children.Add(new Ctrl_3DView(FrmCnt_End-FrmCnt_Start+1,bmp));
+            foreach (object o in Stack_Right.Children)
+            {
+                if (o is Ctrl_3DView)
+                {
+                    ((Ctrl_3DView)(o)).grid.Height = this.Stack_Right.ActualHeight / 2;
                 }
             }
 

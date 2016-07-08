@@ -7,6 +7,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -141,117 +142,130 @@ namespace Microsat
             MeshGeometry3D mg3d_Right = new MeshGeometry3D();
             MeshGeometry3D mg3d_Up = new MeshGeometry3D();
             MeshGeometry3D mg3d_Down = new MeshGeometry3D();
-            #region 3D立方体正视图
-            mg3d_Top.Positions.Add(new Point3D(0, 0, 640));
-            mg3d_Top.Positions.Add(new Point3D(2048, 0, 640));
-            mg3d_Top.Positions.Add(new Point3D(2048, lines, 640));
-            mg3d_Top.Positions.Add(new Point3D(0, lines, 640));
-            mg3d_Top.TriangleIndices.Add(0);
-            mg3d_Top.TriangleIndices.Add(1);
-            mg3d_Top.TriangleIndices.Add(2);
-            mg3d_Top.TriangleIndices.Add(2);
-            mg3d_Top.TriangleIndices.Add(3);
-            mg3d_Top.TriangleIndices.Add(0);
-            mg3d_Top.TextureCoordinates.Add(new System.Windows.Point(0, 1));
-            mg3d_Top.TextureCoordinates.Add(new System.Windows.Point(1, 1));
-            mg3d_Top.TextureCoordinates.Add(new System.Windows.Point(1, 0));
-            mg3d_Top.TextureCoordinates.Add(new System.Windows.Point(0, 0));
-            #endregion
-            #region 3D立方体左视图
-            mg3d_Left.Positions.Add(new Point3D(0, 0, 0));
-            mg3d_Left.Positions.Add(new Point3D(0, 0, 640));
-            mg3d_Left.Positions.Add(new Point3D(0, lines, 640));
-            mg3d_Left.Positions.Add(new Point3D(0, lines, 0));
-            mg3d_Left.TriangleIndices.Add(0);
-            mg3d_Left.TriangleIndices.Add(1);
-            mg3d_Left.TriangleIndices.Add(2);
-            mg3d_Left.TriangleIndices.Add(2);
-            mg3d_Left.TriangleIndices.Add(3);
-            mg3d_Left.TriangleIndices.Add(0);
-            mg3d_Left.TextureCoordinates.Add(new System.Windows.Point(0, 1));
-            mg3d_Left.TextureCoordinates.Add(new System.Windows.Point(0, 0));
-            mg3d_Left.TextureCoordinates.Add(new System.Windows.Point(1, 0));
-            mg3d_Left.TextureCoordinates.Add(new System.Windows.Point(1, 1));
-            #endregion
-            #region 3D立方体右视图
-            mg3d_Right.Positions.Add(new Point3D(2048, 0, 0));
-            mg3d_Right.Positions.Add(new Point3D(2048, lines, 0));
-            mg3d_Right.Positions.Add(new Point3D(2048, lines, 640));
-            mg3d_Right.Positions.Add(new Point3D(2048, 0, 640));
-            mg3d_Right.TriangleIndices.Add(0);
-            mg3d_Right.TriangleIndices.Add(1);
-            mg3d_Right.TriangleIndices.Add(2);
-            mg3d_Right.TriangleIndices.Add(2);
-            mg3d_Right.TriangleIndices.Add(3);
-            mg3d_Right.TriangleIndices.Add(0);
-            mg3d_Right.TextureCoordinates.Add(new System.Windows.Point(0, 1));
-            mg3d_Right.TextureCoordinates.Add(new System.Windows.Point(1, 1));
-            mg3d_Right.TextureCoordinates.Add(new System.Windows.Point(1, 0));
-            mg3d_Right.TextureCoordinates.Add(new System.Windows.Point(0, 0));
-            #endregion
-            #region 3D立方体背视图
-            mg3d_Bottom.Positions.Add(new Point3D(0, 0, 0));
-            mg3d_Bottom.Positions.Add(new Point3D(0, lines, 0));
-            mg3d_Bottom.Positions.Add(new Point3D(2048, lines, 0));
-            mg3d_Bottom.Positions.Add(new Point3D(2048, 0, 0));
-            mg3d_Bottom.TriangleIndices.Add(0);
-            mg3d_Bottom.TriangleIndices.Add(1);
-            mg3d_Bottom.TriangleIndices.Add(2);
-            mg3d_Bottom.TriangleIndices.Add(2);
-            mg3d_Bottom.TriangleIndices.Add(3);
-            mg3d_Bottom.TriangleIndices.Add(0);
-            mg3d_Bottom.TextureCoordinates.Add(new System.Windows.Point(1, 1));
-            mg3d_Bottom.TextureCoordinates.Add(new System.Windows.Point(1, 0));
-            mg3d_Bottom.TextureCoordinates.Add(new System.Windows.Point(0, 0));
-            mg3d_Bottom.TextureCoordinates.Add(new System.Windows.Point(0, 1));
-            #endregion
-            #region 3D立方体顶视图
-            mg3d_Up.Positions.Add(new Point3D(0, lines, 0));
-            mg3d_Up.Positions.Add(new Point3D(0, lines, 640));
-            mg3d_Up.Positions.Add(new Point3D(2048, lines, 640));
-            mg3d_Up.Positions.Add(new Point3D(2048, lines, 0));
-            mg3d_Up.TriangleIndices.Add(0);
-            mg3d_Up.TriangleIndices.Add(1);
-            mg3d_Up.TriangleIndices.Add(2);
-            mg3d_Up.TriangleIndices.Add(2);
-            mg3d_Up.TriangleIndices.Add(3);
-            mg3d_Up.TriangleIndices.Add(0);
-            mg3d_Up.TextureCoordinates.Add(new System.Windows.Point(1, 1));
-            mg3d_Up.TextureCoordinates.Add(new System.Windows.Point(1, 0));
-            mg3d_Up.TextureCoordinates.Add(new System.Windows.Point(0, 0));
-            mg3d_Up.TextureCoordinates.Add(new System.Windows.Point(0, 1));
-            #endregion
-            #region 3D立方体底视图
-            mg3d_Down.Positions.Add(new Point3D(0, 0, 0));
-            mg3d_Down.Positions.Add(new Point3D(2048, 0, 0));
-            mg3d_Down.Positions.Add(new Point3D(2048, 0, 640));
-            mg3d_Down.Positions.Add(new Point3D(0, 0, 640));
-            mg3d_Down.TriangleIndices.Add(0);
-            mg3d_Down.TriangleIndices.Add(1);
-            mg3d_Down.TriangleIndices.Add(2);
-            mg3d_Down.TriangleIndices.Add(2);
-            mg3d_Down.TriangleIndices.Add(3);
-            mg3d_Down.TriangleIndices.Add(0);
-            mg3d_Down.TextureCoordinates.Add(new System.Windows.Point(1, 1));
-            mg3d_Down.TextureCoordinates.Add(new System.Windows.Point(0, 1));
-            mg3d_Down.TextureCoordinates.Add(new System.Windows.Point(0, 0));
-            mg3d_Down.TextureCoordinates.Add(new System.Windows.Point(1, 0));
-            #endregion
+            
+                #region 3D立方体正视图
+                mg3d_Top.Positions.Add(new Point3D(0, 0, 640));
+                mg3d_Top.Positions.Add(new Point3D(2048, 0, 640));
+                mg3d_Top.Positions.Add(new Point3D(2048, lines, 640));
+                mg3d_Top.Positions.Add(new Point3D(0, lines, 640));
+                mg3d_Top.TriangleIndices.Add(0);
+                mg3d_Top.TriangleIndices.Add(1);
+                mg3d_Top.TriangleIndices.Add(2);
+                mg3d_Top.TriangleIndices.Add(2);
+                mg3d_Top.TriangleIndices.Add(3);
+                mg3d_Top.TriangleIndices.Add(0);
+                mg3d_Top.TextureCoordinates.Add(new System.Windows.Point(0, 1));
+                mg3d_Top.TextureCoordinates.Add(new System.Windows.Point(1, 1));
+                mg3d_Top.TextureCoordinates.Add(new System.Windows.Point(1, 0));
+                mg3d_Top.TextureCoordinates.Add(new System.Windows.Point(0, 0));
+                #endregion
+
+                #region 3D立方体左视图
+                mg3d_Left.Positions.Add(new Point3D(0, 0, 0));
+                mg3d_Left.Positions.Add(new Point3D(0, 0, 640));
+                mg3d_Left.Positions.Add(new Point3D(0, lines, 640));
+                mg3d_Left.Positions.Add(new Point3D(0, lines, 0));
+                mg3d_Left.TriangleIndices.Add(0);
+                mg3d_Left.TriangleIndices.Add(1);
+                mg3d_Left.TriangleIndices.Add(2);
+                mg3d_Left.TriangleIndices.Add(2);
+                mg3d_Left.TriangleIndices.Add(3);
+                mg3d_Left.TriangleIndices.Add(0);
+                mg3d_Left.TextureCoordinates.Add(new System.Windows.Point(0, 1));
+                mg3d_Left.TextureCoordinates.Add(new System.Windows.Point(0, 0));
+                mg3d_Left.TextureCoordinates.Add(new System.Windows.Point(1, 0));
+                mg3d_Left.TextureCoordinates.Add(new System.Windows.Point(1, 1));
+                #endregion
+
+                #region 3D立方体右视图
+                mg3d_Right.Positions.Add(new Point3D(2048, 0, 0));
+                mg3d_Right.Positions.Add(new Point3D(2048, lines, 0));
+                mg3d_Right.Positions.Add(new Point3D(2048, lines, 640));
+                mg3d_Right.Positions.Add(new Point3D(2048, 0, 640));
+                mg3d_Right.TriangleIndices.Add(0);
+                mg3d_Right.TriangleIndices.Add(1);
+                mg3d_Right.TriangleIndices.Add(2);
+                mg3d_Right.TriangleIndices.Add(2);
+                mg3d_Right.TriangleIndices.Add(3);
+                mg3d_Right.TriangleIndices.Add(0);
+                mg3d_Right.TextureCoordinates.Add(new System.Windows.Point(0, 1));
+                mg3d_Right.TextureCoordinates.Add(new System.Windows.Point(1, 1));
+                mg3d_Right.TextureCoordinates.Add(new System.Windows.Point(1, 0));
+                mg3d_Right.TextureCoordinates.Add(new System.Windows.Point(0, 0));
+                #endregion
+
+                #region 3D立方体背视图
+                mg3d_Bottom.Positions.Add(new Point3D(0, 0, 0));
+                mg3d_Bottom.Positions.Add(new Point3D(0, lines, 0));
+                mg3d_Bottom.Positions.Add(new Point3D(2048, lines, 0));
+                mg3d_Bottom.Positions.Add(new Point3D(2048, 0, 0));
+                mg3d_Bottom.TriangleIndices.Add(0);
+                mg3d_Bottom.TriangleIndices.Add(1);
+                mg3d_Bottom.TriangleIndices.Add(2);
+                mg3d_Bottom.TriangleIndices.Add(2);
+                mg3d_Bottom.TriangleIndices.Add(3);
+                mg3d_Bottom.TriangleIndices.Add(0);
+                mg3d_Bottom.TextureCoordinates.Add(new System.Windows.Point(1, 1));
+                mg3d_Bottom.TextureCoordinates.Add(new System.Windows.Point(1, 0));
+                mg3d_Bottom.TextureCoordinates.Add(new System.Windows.Point(0, 0));
+                mg3d_Bottom.TextureCoordinates.Add(new System.Windows.Point(0, 1));
+                #endregion
+
+                #region 3D立方体顶视图
+                mg3d_Up.Positions.Add(new Point3D(0, lines, 0));
+                mg3d_Up.Positions.Add(new Point3D(0, lines, 640));
+                mg3d_Up.Positions.Add(new Point3D(2048, lines, 640));
+                mg3d_Up.Positions.Add(new Point3D(2048, lines, 0));
+                mg3d_Up.TriangleIndices.Add(0);
+                mg3d_Up.TriangleIndices.Add(1);
+                mg3d_Up.TriangleIndices.Add(2);
+                mg3d_Up.TriangleIndices.Add(2);
+                mg3d_Up.TriangleIndices.Add(3);
+                mg3d_Up.TriangleIndices.Add(0);
+                mg3d_Up.TextureCoordinates.Add(new System.Windows.Point(1, 1));
+                mg3d_Up.TextureCoordinates.Add(new System.Windows.Point(1, 0));
+                mg3d_Up.TextureCoordinates.Add(new System.Windows.Point(0, 0));
+                mg3d_Up.TextureCoordinates.Add(new System.Windows.Point(0, 1));
+                #endregion
+
+                #region 3D立方体底视图
+                mg3d_Down.Positions.Add(new Point3D(0, 0, 0));
+                mg3d_Down.Positions.Add(new Point3D(2048, 0, 0));
+                mg3d_Down.Positions.Add(new Point3D(2048, 0, 640));
+                mg3d_Down.Positions.Add(new Point3D(0, 0, 640));
+                mg3d_Down.TriangleIndices.Add(0);
+                mg3d_Down.TriangleIndices.Add(1);
+                mg3d_Down.TriangleIndices.Add(2);
+                mg3d_Down.TriangleIndices.Add(2);
+                mg3d_Down.TriangleIndices.Add(3);
+                mg3d_Down.TriangleIndices.Add(0);
+                mg3d_Down.TextureCoordinates.Add(new System.Windows.Point(1, 1));
+                mg3d_Down.TextureCoordinates.Add(new System.Windows.Point(0, 1));
+                mg3d_Down.TextureCoordinates.Add(new System.Windows.Point(0, 0));
+                mg3d_Down.TextureCoordinates.Add(new System.Windows.Point(1, 0));
+                #endregion
 
 
             BitmapImage[] bmpSource = new BitmapImage[3];
 
+            /*
             for (int i = 0; i < 3; i++)
             {
                 MemoryStream ms = new MemoryStream();
                 bmpArray[i].Save(ms, System.Drawing.Imaging.ImageFormat.Bmp);
-
                 bmpSource[i] = new BitmapImage();
                 bmpSource[i].BeginInit();
                 bmpSource[i].StreamSource = ms;
                 bmpSource[i].EndInit();
-
             }
+            */
+
+            for(int i=0;i<3;i++)
+            {
+                bmpArray[i].Save($"cube_{i}.bmp");
+                bmpSource[i] = new BitmapImage(new Uri($"{Environment.CurrentDirectory}\\cube_{i}.bmp"));
+            };
+
             DiffuseMaterial dm_Top = new DiffuseMaterial(new System.Windows.Media.ImageBrush(bmpSource[0]));
             DiffuseMaterial dm_Bottom = new DiffuseMaterial(new System.Windows.Media.ImageBrush(bmpSource[1]));
             DiffuseMaterial dm_Up = new DiffuseMaterial(new System.Windows.Media.ImageBrush(bmpSource[2]));
@@ -261,6 +275,7 @@ namespace Microsat
             GeometryModel3D gm3d_Bottom = new GeometryModel3D(mg3d_Bottom, dm_Bottom);
             GeometryModel3D gm3d_Up = new GeometryModel3D(mg3d_Up, dm_Up);
             GeometryModel3D gm3d_Down = new GeometryModel3D(mg3d_Down, dm_Up);
+
             m3dg.Children.Add(gm3d_Top);
             m3dg.Children.Add(gm3d_Left);
             m3dg.Children.Add(gm3d_Right);

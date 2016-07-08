@@ -75,6 +75,10 @@
     <Reference Include="DynamicDataDisplay">
       <HintPath>.\DynamicDataDisplay.dll</HintPath>
     </Reference>
+    <Reference Include="FreeImageNET, Version=3.15.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\FreeImage\FreeImageNET.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.configuration" />
     <Reference Include="System.Data" />
@@ -117,6 +121,9 @@
     <Compile Include="Windows\Window_3DCube.xaml.cs">
       <DependentUpon>Window_3DCube.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Windows\Window_3DTest.xaml.cs">
+      <DependentUpon>Window_3DTest.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Windows\Window_Map.xaml.cs">
       <DependentUpon>Window_Map.xaml</DependentUpon>
     </Compile>
@@ -140,6 +147,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Windows\Window_3DCube.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Windows\Window_3DTest.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -199,10 +210,6 @@
     <Resource Include="Resources\Image_Logo_CAS.png" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\FreeImage.NET\Library\FreeImageDotNet.csproj">
-      <Project>{6598a7cd-8f27-4d3f-a675-5ae63113a7c3}</Project>
-      <Name>FreeImageDotNet</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\WFTools3D\WFTools3D\WFTools3D.csproj">
       <Project>{4f58d960-50f3-434f-b2b0-c9ed67151485}</Project>
       <Name>WFTools3D</Name>
@@ -219,7 +226,15 @@
   <ItemGroup>
     <Resource Include="Images\folder-12.png" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Resource Include="UserControls\Facade.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="UserControls\Ground.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="UserControls\Poster.jpg" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
