@@ -22,6 +22,8 @@ namespace Microsat.UserControls
     /// </summary>
     public partial class Ctrl_3DView : UserControl
     {
+
+        double imheight = 0;
         public Ctrl_3DView(double lines,System.Drawing.Bitmap[] bmpArray)
         {
             InitializeComponent();
@@ -31,7 +33,7 @@ namespace Microsat.UserControls
             //brush.TileMode = TileMode.Tile;
             //brush.Viewport = new Rect(0, 0, 0.02, 0.02);
             // brush.Freeze();
-
+            imheight = lines;
             //InitializeScene(brush);
             RenderBox(lines, bmpArray);
             InitializeCameras();
@@ -57,10 +59,10 @@ namespace Microsat.UserControls
             MeshGeometry3D mg3d_Down = new MeshGeometry3D();
 
             #region 3D立方体正视图
-            mg3d_Top.Positions.Add(new Point3D(0, 0, 640));
-            mg3d_Top.Positions.Add(new Point3D(2048, 0, 640));
-            mg3d_Top.Positions.Add(new Point3D(2048, lines, 640));
-            mg3d_Top.Positions.Add(new Point3D(0, lines, 640));
+            mg3d_Top.Positions.Add(new Point3D(0, 0, 64.0));
+            mg3d_Top.Positions.Add(new Point3D(204.8, 0, 64.0));
+            mg3d_Top.Positions.Add(new Point3D(204.8, lines/10, 64.0));
+            mg3d_Top.Positions.Add(new Point3D(0, lines/10, 64.0));
             mg3d_Top.TriangleIndices.Add(0);
             mg3d_Top.TriangleIndices.Add(1);
             mg3d_Top.TriangleIndices.Add(2);
@@ -75,9 +77,9 @@ namespace Microsat.UserControls
 
             #region 3D立方体左视图
             mg3d_Left.Positions.Add(new Point3D(0, 0, 0));
-            mg3d_Left.Positions.Add(new Point3D(0, 0, 640));
-            mg3d_Left.Positions.Add(new Point3D(0, lines, 640));
-            mg3d_Left.Positions.Add(new Point3D(0, lines, 0));
+            mg3d_Left.Positions.Add(new Point3D(0, 0, 64.0));
+            mg3d_Left.Positions.Add(new Point3D(0, lines/10, 64.0));
+            mg3d_Left.Positions.Add(new Point3D(0, lines/10, 0));
             mg3d_Left.TriangleIndices.Add(0);
             mg3d_Left.TriangleIndices.Add(1);
             mg3d_Left.TriangleIndices.Add(2);
@@ -91,10 +93,10 @@ namespace Microsat.UserControls
             #endregion
 
             #region 3D立方体右视图
-            mg3d_Right.Positions.Add(new Point3D(2048, 0, 0));
-            mg3d_Right.Positions.Add(new Point3D(2048, lines, 0));
-            mg3d_Right.Positions.Add(new Point3D(2048, lines, 640));
-            mg3d_Right.Positions.Add(new Point3D(2048, 0, 640));
+            mg3d_Right.Positions.Add(new Point3D(204.8, 0, 0));
+            mg3d_Right.Positions.Add(new Point3D(204.8, lines/10, 0));
+            mg3d_Right.Positions.Add(new Point3D(204.8, lines/10, 64.0));
+            mg3d_Right.Positions.Add(new Point3D(204.8, 0, 64.0));
             mg3d_Right.TriangleIndices.Add(0);
             mg3d_Right.TriangleIndices.Add(1);
             mg3d_Right.TriangleIndices.Add(2);
@@ -109,9 +111,9 @@ namespace Microsat.UserControls
 
             #region 3D立方体背视图
             mg3d_Bottom.Positions.Add(new Point3D(0, 0, 0));
-            mg3d_Bottom.Positions.Add(new Point3D(0, lines, 0));
-            mg3d_Bottom.Positions.Add(new Point3D(2048, lines, 0));
-            mg3d_Bottom.Positions.Add(new Point3D(2048, 0, 0));
+            mg3d_Bottom.Positions.Add(new Point3D(0, lines/10, 0));
+            mg3d_Bottom.Positions.Add(new Point3D(204.8, lines/10, 0));
+            mg3d_Bottom.Positions.Add(new Point3D(204.8, 0, 0));
             mg3d_Bottom.TriangleIndices.Add(0);
             mg3d_Bottom.TriangleIndices.Add(1);
             mg3d_Bottom.TriangleIndices.Add(2);
@@ -125,41 +127,41 @@ namespace Microsat.UserControls
             #endregion
 
             #region 3D立方体顶视图
-            mg3d_Up.Positions.Add(new Point3D(0, lines, 0));
-            mg3d_Up.Positions.Add(new Point3D(0, lines, 640));
-            mg3d_Up.Positions.Add(new Point3D(2048, lines, 640));
-            mg3d_Up.Positions.Add(new Point3D(2048, lines, 0));
+            mg3d_Up.Positions.Add(new Point3D(0, lines/10, 0));
+            mg3d_Up.Positions.Add(new Point3D(0, lines/10, 64.0));
+            mg3d_Up.Positions.Add(new Point3D(204.8, lines/10, 64.0));
+            mg3d_Up.Positions.Add(new Point3D(204.8, lines/10, 0));
             mg3d_Up.TriangleIndices.Add(0);
             mg3d_Up.TriangleIndices.Add(1);
             mg3d_Up.TriangleIndices.Add(2);
             mg3d_Up.TriangleIndices.Add(2);
             mg3d_Up.TriangleIndices.Add(3);
             mg3d_Up.TriangleIndices.Add(0);
-            mg3d_Up.TextureCoordinates.Add(new System.Windows.Point(1, 1));
-            mg3d_Up.TextureCoordinates.Add(new System.Windows.Point(1, 0));
-            mg3d_Up.TextureCoordinates.Add(new System.Windows.Point(0, 0));
             mg3d_Up.TextureCoordinates.Add(new System.Windows.Point(0, 1));
+            mg3d_Up.TextureCoordinates.Add(new System.Windows.Point(0, 0));
+            mg3d_Up.TextureCoordinates.Add(new System.Windows.Point(1, 0));
+            mg3d_Up.TextureCoordinates.Add(new System.Windows.Point(1, 1));
             #endregion
 
             #region 3D立方体底视图
             mg3d_Down.Positions.Add(new Point3D(0, 0, 0));
-            mg3d_Down.Positions.Add(new Point3D(2048, 0, 0));
-            mg3d_Down.Positions.Add(new Point3D(2048, 0, 640));
-            mg3d_Down.Positions.Add(new Point3D(0, 0, 640));
+            mg3d_Down.Positions.Add(new Point3D(204.8, 0, 0));
+            mg3d_Down.Positions.Add(new Point3D(204.8, 0, 64.0));
+            mg3d_Down.Positions.Add(new Point3D(0, 0, 64.0));
             mg3d_Down.TriangleIndices.Add(0);
             mg3d_Down.TriangleIndices.Add(1);
             mg3d_Down.TriangleIndices.Add(2);
             mg3d_Down.TriangleIndices.Add(2);
             mg3d_Down.TriangleIndices.Add(3);
             mg3d_Down.TriangleIndices.Add(0);
-            mg3d_Down.TextureCoordinates.Add(new System.Windows.Point(1, 1));
             mg3d_Down.TextureCoordinates.Add(new System.Windows.Point(0, 1));
-            mg3d_Down.TextureCoordinates.Add(new System.Windows.Point(0, 0));
+            mg3d_Down.TextureCoordinates.Add(new System.Windows.Point(1, 1));
             mg3d_Down.TextureCoordinates.Add(new System.Windows.Point(1, 0));
+            mg3d_Down.TextureCoordinates.Add(new System.Windows.Point(0, 0));
             #endregion
 
 
-            BitmapImage[] bmpSource = new BitmapImage[3];
+            BitmapImage[] bmpSource = new BitmapImage[6];
 
             /*
             for (int i = 0; i < 3; i++)
@@ -173,7 +175,7 @@ namespace Microsat.UserControls
             }
             */
 
-            for (int i = 0; i < 3; i++)
+            for (int i = 0; i <6; i++)
             {
                 bmpArray[i].Save($"cube_{i}.bmp");
                 bmpSource[i] = new BitmapImage(new Uri($"{Environment.CurrentDirectory}\\cube_{i}.bmp"));
@@ -182,12 +184,15 @@ namespace Microsat.UserControls
             DiffuseMaterial dm_Top = new DiffuseMaterial(new System.Windows.Media.ImageBrush(bmpSource[0]));
             DiffuseMaterial dm_Bottom = new DiffuseMaterial(new System.Windows.Media.ImageBrush(bmpSource[1]));
             DiffuseMaterial dm_Up = new DiffuseMaterial(new System.Windows.Media.ImageBrush(bmpSource[2]));
+            DiffuseMaterial dm_Down = new DiffuseMaterial(new System.Windows.Media.ImageBrush(bmpSource[3]));
+            DiffuseMaterial dm_Right = new DiffuseMaterial(new System.Windows.Media.ImageBrush(bmpSource[4]));
+            DiffuseMaterial dm_Left = new DiffuseMaterial(new System.Windows.Media.ImageBrush(bmpSource[5]));
             GeometryModel3D gm3d_Top = new GeometryModel3D(mg3d_Top, dm_Top);
-            GeometryModel3D gm3d_Left = new GeometryModel3D(mg3d_Left, dm_Top);
-            GeometryModel3D gm3d_Right = new GeometryModel3D(mg3d_Right, dm_Top);
+            GeometryModel3D gm3d_Left = new GeometryModel3D(mg3d_Left, dm_Left);
+            GeometryModel3D gm3d_Right = new GeometryModel3D(mg3d_Right, dm_Right);
             GeometryModel3D gm3d_Bottom = new GeometryModel3D(mg3d_Bottom, dm_Bottom);
             GeometryModel3D gm3d_Up = new GeometryModel3D(mg3d_Up, dm_Up);
-            GeometryModel3D gm3d_Down = new GeometryModel3D(mg3d_Down, dm_Up);
+            GeometryModel3D gm3d_Down = new GeometryModel3D(mg3d_Down, dm_Down);
 
             m3dg.Children.Add(gm3d_Top);
             m3dg.Children.Add(gm3d_Left);
@@ -372,10 +377,10 @@ namespace Microsat.UserControls
             scene.Camera.Position = new Point3D(2000, 2000, 2000);
             scene.Camera.FieldOfView = 60;
             //scene.Camera.LookAtOrigin();
-
-            scene.Camera.Position = new Point3D(-670, 190, 10);
-            scene.Camera.LookDirection = new Vector3D(1, -0.24, 0);
-            scene.Camera.UpDirection = Math3D.UnitZ;
+            double scalar = 0.2;
+            scene.Camera.Position = new Point3D(scalar*2048, scalar * imheight, scalar * 2048);
+            scene.Camera.LookDirection = new Vector3D(-2048, -imheight , -2048);
+            scene.Camera.UpDirection = Math3D.UnitY;
             scene.Camera.FieldOfView = 60;
             scene.Camera.Speed = 0;
         }
@@ -432,5 +437,16 @@ namespace Microsat.UserControls
             //if (e.Key == Key.Escape) ;
                // Close();
         }
+
+        private void scene_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            int X = (int)(scene.touchPoint.X*10);
+            int Y = (int)(scene.touchPoint.Y*10);
+            int Z = (int)(scene.touchPoint.Z * 10 / 4);
+            this.tb_3DCoord.Text = $"({X},{Y},{Z})";
+            
+        }
+
+       
     }
 }

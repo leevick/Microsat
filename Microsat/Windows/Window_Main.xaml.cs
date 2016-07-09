@@ -113,11 +113,13 @@ namespace Microsat
             DataTable dt = this.dt_Result;
             //App.global_Win_Map.Show();
             //App.global_Win_Map.DrawRectangle(new Point((double)dt_Result.Rows[0].ItemArray[3], (double)dt_Result.Rows[0].ItemArray[4]), new Point((double)dt_Result.Rows[dt_Result.Rows.Count - 1].ItemArray[3], (double)dt_Result.Rows[dt_Result.Rows.Count - 1].ItemArray[4]));
-            App.global_Win_ImageShow.Refresh(dt);
-            App.global_Win_ImageShow.Show();
+            //App.global_Win_ImageShow.Refresh(dt);
+            //App.global_Win_ImageShow.Show();
             //App.global_Win_3DCube.Show();
-           // App.global_Win_3DCube.Refresh(dt);
-            
+            // App.global_Win_3DCube.Refresh(dt);
+            App.global_Win_SpecImg.Show();
+            App.global_Win_SpecImg.grid.ColumnDefinitions[0].Width = new GridLength(1, GridUnitType.Star);
+            App.global_Win_SpecImg.grid.ColumnDefinitions[1].Width = new GridLength(1,GridUnitType.Star);
         }
         private void Win_Main_Closed(object sender, EventArgs e)
         {

@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using Microsat.Shared;
 using System.Drawing;
+using Microsat.Windows;
 
 namespace Microsat
 {
@@ -18,6 +19,7 @@ namespace Microsat
         public static Window_SpecCurv global_Win_ImageShow;
         public static Window_Map global_Win_Map;
         public static Window_3DCube global_Win_3DCube;
+        public static Window_SpecImg global_Win_SpecImg;
 
         private void Application_Startup(object sender, StartupEventArgs e)
         {
@@ -32,6 +34,8 @@ namespace Microsat
             global_Win_ImageShow = new Window_SpecCurv(Variables.Screen_Locations[1]);
             global_Win_Map = new Window_Map(Variables.Screen_Locations[1]);
             global_Win_3DCube = new Window_3DCube();
+            global_Win_SpecImg = new Window_SpecImg();
+            
             //global_Win_Map.Show();
             //global_Win_ImageShow.Show();
         }

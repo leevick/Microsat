@@ -13,7 +13,7 @@
         <ImageBrush x:Key="Poster" ImageSource="Poster.jpg"/>
     </UserControl.Resources>
     <Grid Name="grid">
-        <Custom:Scene3D BorderBrush="Black" Name="scene" BorderThickness="1" Background="#FFD8D8D8"/>
+        <Custom:Scene3D BorderBrush="Black" Name="scene" BorderThickness="1" Background="#FFD8D8D8" MouseDown="scene_MouseDown"/>
         <Grid x:Name="info" Background="LightGray" Opacity="0.5" HorizontalAlignment="Right" VerticalAlignment="Top">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
@@ -36,5 +36,6 @@
                 </EventTrigger>
             </Grid.Triggers>
         </Grid>
+        <TextBlock x:Name="tb_3DCoord" HorizontalAlignment="Left" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Top" Margin="20,20,0,0" FontSize="24" Background="White"/>
     </Grid>
 </UserControl>

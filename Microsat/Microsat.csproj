@@ -130,6 +130,9 @@
     <Compile Include="Windows\Window_SpecCurv.xaml.cs">
       <DependentUpon>Window_SpecCurv.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Windows\Window_SpecImg.xaml.cs">
+      <DependentUpon>Window_SpecImg.xaml</DependentUpon>
+    </Compile>
     <Page Include="UserControls\Ctrl_3DView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -176,6 +179,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Windows\Window_SpecCurv.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Windows\Window_SpecImg.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
