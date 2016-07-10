@@ -271,7 +271,7 @@
                     </Grid>
                 </Grid>
             </TabItem>
-            <TabItem d:LayoutOverrides="LeftMargin, RightMargin" Width="208" Margin="0,-1,0,1" Height="100" Header="应用演示" FontSize="32">
+            <TabItem d:LayoutOverrides="LeftMargin, RightMargin" Width="208" Margin="0,-1,0,1" Height="100" FontSize="32">
                 <Grid Background="#FFE5E5E5">
                     <DockPanel Width="500" Margin="0" LastChildFill="False" HorizontalAlignment="Left"/>
                 </Grid>

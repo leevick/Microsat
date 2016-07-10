@@ -74,6 +74,7 @@ namespace Microsat.Windows
         {
             Bitmap bmp = await DataProc.GetBmp(v);
             u[i].Refresh(bmp);
+
         }
 
         private void Window_Closed(object sender, EventArgs e)

@@ -36,6 +36,8 @@ namespace Microsat
         {
             Uri uri = new Uri(pathMap + "&lat=" + (0.5*Start.X+0.5*End.X).ToString()+ "&lon=" + (0.5*Start.Y+0.5*End.Y).ToString()+"&start_lat="+Start.X.ToString()+"&start_lon="+Start.Y.ToString()+"&end_lat="+End.X.ToString()+"&end_lon="+End.Y.ToString());
             webMap.Navigate(uri);
+            Uri uri_2 = new Uri("file://127.0.0.1/C$/Users/Victor/Desktop/f3earth-master/examples/simple.html");
+            webEarth.Navigate(uri_2);
         }
         private void windowMap_Loaded(object sender, RoutedEventArgs e)
         {

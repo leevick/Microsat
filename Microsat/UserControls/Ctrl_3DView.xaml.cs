@@ -47,6 +47,8 @@ namespace Microsat.UserControls
         public Ctrl_3DView()
         {
             InitializeComponent();
+
+
         }
 
        
@@ -99,10 +101,10 @@ namespace Microsat.UserControls
             mg3d_Left.TriangleIndices.Add(2);
             mg3d_Left.TriangleIndices.Add(3);
             mg3d_Left.TriangleIndices.Add(0);
-            mg3d_Left.TextureCoordinates.Add(new System.Windows.Point(0, 1));
             mg3d_Left.TextureCoordinates.Add(new System.Windows.Point(0, 0));
-            mg3d_Left.TextureCoordinates.Add(new System.Windows.Point(1, 0));
+            mg3d_Left.TextureCoordinates.Add(new System.Windows.Point(0, 1));
             mg3d_Left.TextureCoordinates.Add(new System.Windows.Point(1, 1));
+            mg3d_Left.TextureCoordinates.Add(new System.Windows.Point(1, 0));
             #endregion
 
             #region 3D立方体右视图
@@ -116,10 +118,10 @@ namespace Microsat.UserControls
             mg3d_Right.TriangleIndices.Add(2);
             mg3d_Right.TriangleIndices.Add(3);
             mg3d_Right.TriangleIndices.Add(0);
-            mg3d_Right.TextureCoordinates.Add(new System.Windows.Point(0, 1));
-            mg3d_Right.TextureCoordinates.Add(new System.Windows.Point(1, 1));
-            mg3d_Right.TextureCoordinates.Add(new System.Windows.Point(1, 0));
             mg3d_Right.TextureCoordinates.Add(new System.Windows.Point(0, 0));
+            mg3d_Right.TextureCoordinates.Add(new System.Windows.Point(1, 0));
+            mg3d_Right.TextureCoordinates.Add(new System.Windows.Point(1, 1));
+            mg3d_Right.TextureCoordinates.Add(new System.Windows.Point(0, 1));
             #endregion
 
             #region 3D立方体背视图
@@ -133,10 +135,10 @@ namespace Microsat.UserControls
             mg3d_Bottom.TriangleIndices.Add(2);
             mg3d_Bottom.TriangleIndices.Add(3);
             mg3d_Bottom.TriangleIndices.Add(0);
-            mg3d_Bottom.TextureCoordinates.Add(new System.Windows.Point(1, 1));
-            mg3d_Bottom.TextureCoordinates.Add(new System.Windows.Point(1, 0));
-            mg3d_Bottom.TextureCoordinates.Add(new System.Windows.Point(0, 0));
             mg3d_Bottom.TextureCoordinates.Add(new System.Windows.Point(0, 1));
+            mg3d_Bottom.TextureCoordinates.Add(new System.Windows.Point(0, 0));
+            mg3d_Bottom.TextureCoordinates.Add(new System.Windows.Point(1, 0));
+            mg3d_Bottom.TextureCoordinates.Add(new System.Windows.Point(1, 1));
             #endregion
 
             #region 3D立方体顶视图
@@ -150,10 +152,10 @@ namespace Microsat.UserControls
             mg3d_Up.TriangleIndices.Add(2);
             mg3d_Up.TriangleIndices.Add(3);
             mg3d_Up.TriangleIndices.Add(0);
-            mg3d_Up.TextureCoordinates.Add(new System.Windows.Point(0, 1));
             mg3d_Up.TextureCoordinates.Add(new System.Windows.Point(0, 0));
-            mg3d_Up.TextureCoordinates.Add(new System.Windows.Point(1, 0));
+            mg3d_Up.TextureCoordinates.Add(new System.Windows.Point(0, 1));
             mg3d_Up.TextureCoordinates.Add(new System.Windows.Point(1, 1));
+            mg3d_Up.TextureCoordinates.Add(new System.Windows.Point(1, 0));
             #endregion
 
             #region 3D立方体底视图
@@ -167,10 +169,10 @@ namespace Microsat.UserControls
             mg3d_Down.TriangleIndices.Add(2);
             mg3d_Down.TriangleIndices.Add(3);
             mg3d_Down.TriangleIndices.Add(0);
-            mg3d_Down.TextureCoordinates.Add(new System.Windows.Point(0, 1));
-            mg3d_Down.TextureCoordinates.Add(new System.Windows.Point(1, 1));
-            mg3d_Down.TextureCoordinates.Add(new System.Windows.Point(1, 0));
             mg3d_Down.TextureCoordinates.Add(new System.Windows.Point(0, 0));
+            mg3d_Down.TextureCoordinates.Add(new System.Windows.Point(1, 0));
+            mg3d_Down.TextureCoordinates.Add(new System.Windows.Point(1, 1));
+            mg3d_Down.TextureCoordinates.Add(new System.Windows.Point(0, 1));
             #endregion
 
 
@@ -468,6 +470,7 @@ namespace Microsat.UserControls
             if (IsValid(ref X,ref Y,ref Z))
             {
                 App.global_Win_SpecImg.Refresh(Z, 1);
+                
             }
             
             

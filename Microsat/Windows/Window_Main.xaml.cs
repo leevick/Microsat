@@ -111,7 +111,7 @@ namespace Microsat
 
             DataTable dt = DataQuery.QueryResult;
             //App.global_Win_Map.Show();
-            //App.global_Win_Map.DrawRectangle(new Point((double)dt_Result.Rows[0].ItemArray[3], (double)dt_Result.Rows[0].ItemArray[4]), new Point((double)dt_Result.Rows[dt_Result.Rows.Count - 1].ItemArray[3], (double)dt_Result.Rows[dt_Result.Rows.Count - 1].ItemArray[4]));
+            //App.global_Win_Map.DrawRectangle(new Point((double)DataQuery.QueryResult.Rows[0].ItemArray[3], (double)DataQuery.QueryResult.Rows[0].ItemArray[4]), new Point((double)DataQuery.QueryResult.Rows[DataQuery.QueryResult.Rows.Count - 1].ItemArray[3], (double)DataQuery.QueryResult.Rows[DataQuery.QueryResult.Rows.Count - 1].ItemArray[4]));
             //App.global_Win_ImageShow.Refresh(dt);
             //App.global_Win_ImageShow.Show();
             //App.global_Win_3DCube.Show();
