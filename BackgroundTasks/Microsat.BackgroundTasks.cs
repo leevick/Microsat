@@ -823,7 +823,7 @@ namespace Microsat.BackgroundTasks
 
                 }));
                 Thread _tLeft = new Thread(new ThreadStart(() => {
-                    Bitmap bmpTop = new Bitmap(DataQuery.QueryResult.Rows.Count, 160, System.Drawing.Imaging.PixelFormat.Format24bppRgb);
+                    Bitmap bmpTop = new Bitmap(DataQuery.QueryResult.Rows.Count, 160);
                     BitmapData bmpData = bmpTop.LockBits(new System.Drawing.Rectangle(0, 0, DataQuery.QueryResult.Rows.Count, 160), System.Drawing.Imaging.ImageLockMode.WriteOnly, bmpTop.PixelFormat);
                     byte[] buf_full = new byte[160 * DataQuery.QueryResult.Rows.Count * 4];
                     Parallel.For(0, DataQuery.QueryResult.Rows.Count, (i) => {
@@ -832,7 +832,7 @@ namespace Microsat.BackgroundTasks
                         fs.Read(buf_temp, 0, 512 * 160 * 2);
                         Parallel.For(0, 160, j => {
 
-                            Spectra2RGB.HsvToRgb((double)j / 160 * 300, (double)buf_temp[j * 512 * 2 + 0] / 255, 1, out buf_full[j * DataQuery.QueryResult.Rows.Count * 4 + i * 4], out buf_full[j * DataQuery.QueryResult.Rows.Count * 4 + i * 4 + 1], out buf_full[j * DataQuery.QueryResult.Rows.Count * 4 + i * 4 + 2]);
+                            Spectra2RGB.HsvToRgb((double)j / 160 * 300, (double)buf_temp[j * 512 * 2 + 0] / 255, 1, out buf_full[j * DataQuery.QueryResult.Rows.Count * 4 + i * 4+2], out buf_full[j * DataQuery.QueryResult.Rows.Count * 4 + i * 4 + 1], out buf_full[j * DataQuery.QueryResult.Rows.Count * 4 + i * 4]);
                             buf_full[j * DataQuery.QueryResult.Rows.Count * 4 + i * 4 + 3] = 255;
 
                         });
