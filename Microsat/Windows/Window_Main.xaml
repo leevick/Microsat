@@ -271,9 +271,39 @@
                     </Grid>
                 </Grid>
             </TabItem>
-            <TabItem d:LayoutOverrides="LeftMargin, RightMargin" Width="208" Margin="0,-1,0,1" Height="100" FontSize="32">
+            <TabItem d:LayoutOverrides="Height, LeftMargin, RightMargin" Width="208" Margin="0,-1,0,0" Height="100" FontSize="32" Header="光谱分析" VerticalAlignment="Top">
                 <Grid Background="#FFE5E5E5">
-                    <DockPanel Width="500" Margin="0" LastChildFill="False" HorizontalAlignment="Left"/>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="2*"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel>
+                        <GroupBox x:Name="groupBox" Header="显示模式" FontSize="24" Margin="20,0" d:LayoutOverrides="LeftPosition, RightPosition, TopPosition, BottomPosition">
+                            <StackPanel Margin="0">
+                                <DockPanel Height="50" LastChildFill="False">
+                                    <TextBlock x:Name="textBlock13" TextWrapping="Wrap" VerticalAlignment="Center" Margin="20,0,0,0" FontSize="24"><Run Text="分"/><Run Text="窗"/><Run Text="模式："/></TextBlock>
+                                    <ComboBox x:Name="comboBox" VerticalAlignment="Center" Margin="20,0,0,0" SelectedIndex="0" FontSize="24" SelectionChanged="comboBox_SelectionChanged">
+                                        <ComboBoxItem Content="1窗显示"/>
+                                        <ComboBoxItem Content="2窗显示"/>
+                                        <ComboBoxItem Content="4窗显示"/>
+                                    </ComboBox>
+                                </DockPanel>
+                            </StackPanel>
+                        </GroupBox>
+                        <GroupBox x:Name="groupBox3" Header="窗 1 设置" FontSize="24" d:LayoutOverrides="Width, LeftPosition, RightPosition, TopPosition, BottomPosition" Margin="20,0">
+                            <StackPanel Margin="0">
+                                <DockPanel Height="50" LastChildFill="False">
+                                    <RadioButton x:Name="radioButton" Content="指定谱段" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="55,0,0,0"/>
+                                    <RadioButton x:Name="radioButton_Copy" Content="3D坐标" VerticalAlignment="Center" Margin="55,10.26,0,10.26" HorizontalAlignment="Left"/>
+                                    <RadioButton x:Name="radioButton_Copy1" Content="彩色合成" VerticalAlignment="Center" Margin="55,10.26,0,10.26" HorizontalAlignment="Left"/>
+                                </DockPanel>
+                                <DockPanel Height="50" LastChildFill="False">
+                                    <TextBlock x:Name="textBlock14" TextWrapping="Wrap" Text="谱段：" VerticalAlignment="Center"/>
+                                    <xctk:IntegerUpDown VerticalAlignment="Center"></xctk:IntegerUpDown>
+                                </DockPanel>
+                            </StackPanel>
+                        </GroupBox>
+                    </StackPanel>
                 </Grid>
             </TabItem>
             <TabItem d:LayoutOverrides="LeftMargin, RightMargin, LeftPosition, RightPosition, TopPosition, BottomPosition" Width="208" Height="100" Header="系统设置" FontSize="32">
@@ -289,5 +319,6 @@
             <Button x:Name="button_Exit" Width="100" Padding="1" Margin="0" HorizontalAlignment="Right" FontSize="32" Content="退出" Click="button_Exit_Click" Background="{x:Null}"/>
             <Image x:Name="image1" Width="90" VerticalAlignment="Bottom" Stretch="Fill" Opacity="1" Margin="0,0,522,4" Height="90" HorizontalAlignment="Right" Source="../Resources/Image_Logo_CAS.png"/>
         </Grid>
+        <StackPanel HorizontalAlignment="Left" Height="100" VerticalAlignment="Top" Width="100"/>
     </Grid>
 </Window>

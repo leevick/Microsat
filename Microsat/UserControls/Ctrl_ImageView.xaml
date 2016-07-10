@@ -22,6 +22,6 @@
                 <Image Name="IMG1" RenderTransform="{StaticResource Imageview}" RenderOptions.BitmapScalingMode="NearestNeighbor" MouseDown="IMG1_MouseDown" StretchDirection="DownOnly"/>
             </ContentControl>
         </ScrollViewer>
-        <TextBox x:Name="txtPosi" Height="23" TextWrapping="Wrap" Text="TextBox" Margin="10,10,0,0" VerticalAlignment="Top" HorizontalAlignment="Left"/>
+        <TextBox x:Name="txtPosi" Height="23" TextWrapping="Wrap" Text="&#xD;&#xA;" Margin="10,10,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" FontSize="24"/>
     </Grid>
 </UserControl>

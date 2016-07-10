@@ -27,6 +27,10 @@ namespace Microsat
         /// </summary>
         public string Title;
 
+        public enum DisplayContent { Single,Pick,Sync};
+        public int SpecNum;
+        public int[] RgbSpec=new int[3];
+
         public Ctrl_ImageView()
         {
             InitializeComponent();

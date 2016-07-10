@@ -371,12 +371,19 @@ namespace Microsat
             this.tb_DR_lon_DDMM_MM.ValueChanged -= DDMM_ValueChanged;
         }
 
+
+
+
         #endregion
 
         #endregion
 
-
-
-
+        private void comboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if(App.global_Win_SpecImg != null)
+            {
+                App.global_Win_SpecImg.DisplayMode = (Windows.Window_SpecImg.GridMode)comboBox.SelectedIndex;
+            }
+        }
     }
 }
