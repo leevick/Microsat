@@ -287,7 +287,7 @@ namespace Microsat
         }
         public async void Refresh(DataTable dt_Result)
         {
-            Bitmap[] bmp = await DataProc.GetBmp(dt_Result);
+            Bitmap[] bmp = await DataProc.GetBmp3D();
             ImportId = (int)(dt_Result.Rows[0].ItemArray[14]);
             FrmCnt_Start = int.MaxValue;
             FrmCnt_End = int.MinValue;

@@ -20,10 +20,9 @@ namespace Microsat.Windows
     /// <summary>
     /// Window_SpecImg.xaml 的交互逻辑
     /// </summary>
-    public partial class Window_SpecImg : Window
+    public partial class Window_Split : Window
     {
-        Ctrl_ImageView[] u = new Ctrl_ImageView[4];
-        List<Bitmap> bmp_Buf = new List<Bitmap>();
+        public UserControl[] u = new UserControl[4];
         private GridMode _DisplayMode;
         public GridMode DisplayMode
         {
@@ -60,22 +59,12 @@ namespace Microsat.Windows
                 }
             }
         }
-        public Window_SpecImg()
+        public Window_Split()
         {
             InitializeComponent();
-            u[0]=ImageView_A;
-            u[1] = ImageView_B;
-            u[2] = ImageView_C;
-            u[3] = ImageView_D;
             DisplayMode = GridMode.Two;
         }
         public enum GridMode { One,Two,Four};
-        public async void Refresh(int v,int i)
-        {
-            Bitmap bmp = await DataProc.GetBmp(v);
-            u[i].Refresh(bmp);
-        }
-
         private void Window_Closed(object sender, EventArgs e)
         {
             this.Hide();

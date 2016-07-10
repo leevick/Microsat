@@ -1,5 +1,9 @@
-﻿using System;
+﻿using Microsat.BackgroundTasks;
+using Microsat.Shared;
+using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -37,8 +41,17 @@ namespace Microsat.UserControls
             //InitializeScene(brush);
             RenderBox(lines, bmpArray);
             InitializeCameras();
-            InitializeInfo();
+            //InitializeInfo();
         }
+
+        public Ctrl_3DView()
+        {
+            InitializeComponent();
+        }
+
+       
+
+
         ImageBrush GetBrush(string name, bool doFreeze = true)
         {
             ImageBrush brush = Resources[name] as ImageBrush;
@@ -204,10 +217,18 @@ namespace Microsat.UserControls
             this.scene.Viewport.Children.Add(mv3d);
         }
 
+        internal async void Refresh()
+        {
+            Bitmap[] bmp = await DataProc.GetBmp3D();
+            imheight = DataQuery.QueryResult.Rows.Count;
+            //InitializeScene(brush);
+            RenderBox(imheight, bmp);
+            InitializeCameras();
+            //InitializeInfo();
 
+        }
 
-
-        void InitializeScene(Brush brush)
+        void InitializeScene(System.Windows.Media.Brush brush)
         {
             Square square = new Square(100);
             square.ScaleX = 60;
@@ -217,8 +238,8 @@ namespace Microsat.UserControls
             square.BackMaterial = square.Material;
             scene.Models.Add(square);
 
-            Brush brush1 = GetBrush("Facade");
-            Brush brush2 = GetBrush("Poster");
+            System.Windows.Media.Brush brush1 = GetBrush("Facade");
+            System.Windows.Media.Brush brush2 = GetBrush("Poster");
 
             for (int i = 0; i < 170; i++)
             {
@@ -238,7 +259,7 @@ namespace Microsat.UserControls
                 path.Add(new Point3D(Math.Cos(t), Math.Sin(t), Math.Cos(6 * t) / 3));
             }
             tube.Path = path;
-            tube.DiffuseMaterial.Brush = Brushes.Green;
+            tube.DiffuseMaterial.Brush = System.Windows.Media.Brushes.Green;
             tube.Position = new Point3D(-2, 2, 1);
             scene.Models.Add(tube);
 
@@ -252,7 +273,7 @@ namespace Microsat.UserControls
         }
         Random randy = new Random(0);
 
-        Object3D RandomPrimitive(double x, double y, double z, Brush brush1, Brush brush2)
+        Object3D RandomPrimitive(double x, double y, double z, System.Windows.Media.Brush brush1, System.Windows.Media.Brush brush2)
         {
             Primitive3D obj = null;
             double angle1 = 180 * randy.NextDouble();
@@ -345,14 +366,14 @@ namespace Microsat.UserControls
         DateTime t0;
         PerformanceChecker checker = new PerformanceChecker();
 
-        Brush GetRandomBrush()
+        System.Windows.Media.Brush GetRandomBrush()
         {
             byte[] b = new byte[4];
             randy.NextBytes(b);
-            Color c1 = Color.FromRgb(b[0], b[1], b[2]);
+            System.Windows.Media.Color c1 = System.Windows.Media.Color.FromRgb(b[0], b[1], b[2]);
             randy.NextBytes(b);
-            Color c2 = Color.FromRgb(b[0], b[1], b[2]);
-            Brush brush = new LinearGradientBrush(c1, c2, 90);
+            System.Windows.Media.Color c2 = System.Windows.Media.Color.FromRgb(b[0], b[1], b[2]);
+            System.Windows.Media.Brush brush = new LinearGradientBrush(c1, c2, 90);
             brush.Freeze();
             return brush;
         }
@@ -385,7 +406,7 @@ namespace Microsat.UserControls
             scene.Camera.Speed = 0;
         }
 
-        void InitializeInfo()
+        /*void InitializeInfo()
         {
             AddInfo("1, 2, 3:", "Activate camera 1, 2 or 3");
             AddInfo("W, S:", "Increase/decrease speed");
@@ -412,8 +433,8 @@ namespace Microsat.UserControls
             AddInfo("Ctrl+PgUp:", "Move camera up");
             AddInfo("Ctrl+PgDn:", "Move camera down");
             AddInfo("Shift:", "Increase all above motion steps");
-        }
-
+        }*/
+        /*
         void AddInfo(string s1 = null, string s2 = null)
         {
             int row = info.RowDefinitions.Count;
@@ -422,13 +443,13 @@ namespace Microsat.UserControls
             if (s2 != null)
                 AddInfo(row, 1, s2);
         }
-
+        */
         void AddInfo(int row, int col, string text)
         {
             TextBlock tb = new TextBlock { Text = text, Padding = new Thickness(4, 0, 4, 0) };
             Grid.SetRow(tb, row);
             Grid.SetColumn(tb, col);
-            info.Children.Add(tb);
+            //info.Children.Add(tb);
         }
 
         protected override void OnKeyDown(KeyEventArgs e)
@@ -440,13 +461,27 @@ namespace Microsat.UserControls
 
         private void scene_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            int X = (int)(scene.touchPoint.X*10);
-            int Y = (int)(scene.touchPoint.Y*10);
+            int X = (int)(scene.touchPoint.X * 10);
+            int Y = (int)(scene.touchPoint.Y * 10);
             int Z = (int)(scene.touchPoint.Z * 10 / 4);
             this.tb_3DCoord.Text = $"({X},{Y},{Z})";
+            if (IsValid(ref X,ref Y,ref Z))
+            {
+                App.global_Win_SpecImg.Refresh(Z, 1);
+            }
+            
             
         }
 
-       
+        private bool IsValid(ref int x, ref int y, ref int z)
+        {
+            if (x < 0 || x > 2048) return false;
+            if (y < 0 || y > imheight) return false;
+            if (z < 0 || z > 160) return false;
+            if (x==2048) x = 2047;
+            if (y == imheight) y = (int)imheight-1;
+            if (z == 160) z = 159;
+            return true;
+        }
     }
 }

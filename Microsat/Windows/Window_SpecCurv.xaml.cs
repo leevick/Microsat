@@ -60,14 +60,14 @@ namespace Microsat
               
         }
     
-        public async void Refresh(DataTable dt_Result)
+        public async void Refresh()
         { 
-            Bitmap[] bmp = await DataProc.GetBmp(dt_Result);
-            ImportId =(int) (dt_Result.Rows[0].ItemArray[14]);
+            Bitmap[] bmp = await DataProc.GetBmp3D();
+            ImportId =(int) (DataQuery.QueryResult.Rows[0].ItemArray[14]);
             FrmCnt_Start = int.MaxValue;
             FrmCnt_End = int.MinValue;
             
-            foreach (DataRow dr in dt_Result.Rows)
+            foreach (DataRow dr in DataQuery.QueryResult.Rows)
             {
                 int accountLevel = dr.Field<int>("FrameId");
                 FrmCnt_Start = Math.Min(FrmCnt_Start, accountLevel);

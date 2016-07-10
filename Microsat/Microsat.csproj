@@ -118,6 +118,9 @@
     <Compile Include="UserControls\Ctrl_SpecCurv.xaml.cs">
       <DependentUpon>Ctrl_SpecCurv.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Windows\Window_3D.xaml.cs">
+      <DependentUpon>Window_3D.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Windows\Window_3DCube.xaml.cs">
       <DependentUpon>Window_3DCube.xaml</DependentUpon>
     </Compile>
@@ -129,6 +132,9 @@
     </Compile>
     <Compile Include="Windows\Window_SpecCurv.xaml.cs">
       <DependentUpon>Window_SpecCurv.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\Window_Split.xaml.cs">
+      <DependentUpon>Window_Split.xaml</DependentUpon>
     </Compile>
     <Compile Include="Windows\Window_SpecImg.xaml.cs">
       <DependentUpon>Window_SpecImg.xaml</DependentUpon>
@@ -146,6 +152,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Themes\Generic.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Windows\Window_3D.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -181,6 +191,10 @@
     <Page Include="Windows\Window_SpecCurv.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Windows\Window_Split.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="Windows\Window_SpecImg.xaml">
       <SubType>Designer</SubType>

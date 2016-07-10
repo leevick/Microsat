@@ -42,6 +42,18 @@ namespace Microsat
            // this.IMG1.Source = bmp;
         }
 
+        internal void Refresh(Bitmap bmp)
+        {
+            MemoryStream ms = new MemoryStream();
+            bmp.Save(ms, System.Drawing.Imaging.ImageFormat.Bmp);
+            BitmapImage bmpSource = new BitmapImage();
+            bmpSource.BeginInit();
+            bmpSource.StreamSource = ms;
+            bmpSource.EndInit();
+            this.IMG1.Source = bmpSource;
+            
+        }
+
         public Ctrl_ImageView(Bitmap bmp)
         {
             InitializeComponent();

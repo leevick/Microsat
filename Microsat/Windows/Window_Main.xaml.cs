@@ -78,7 +78,6 @@ namespace Microsat
         public Coord Coord_DR = new Coord(0,0);      //右下角坐标
         public long start_FrmCnt;   //起始帧号
         public long end_FrmCnt;     //终止帧号
-        DataTable dt_Result=new DataTable();        //结果
         #endregion
 
         #region 界面控制按钮
@@ -88,7 +87,7 @@ namespace Microsat
             {
                 DataTable dt = await DataProc.QueryResult((bool)cb_byTime.IsChecked, (bool)this.cb_byCoord.IsChecked, (bool)this.cb_byFrmCnt.IsChecked, start_time, end_time, start_FrmCnt, end_FrmCnt, Coord_TL, Coord_DR);
                 this.dataGrid_Result.ItemsSource = dt.DefaultView;
-                this.dt_Result = dt;
+                DataQuery.QueryResult = dt;
             }
             catch (Exception E)
             {
@@ -110,7 +109,7 @@ namespace Microsat
         private void button_Display_Click(object sender, RoutedEventArgs e)
         {
 
-            DataTable dt = this.dt_Result;
+            DataTable dt = DataQuery.QueryResult;
             //App.global_Win_Map.Show();
             //App.global_Win_Map.DrawRectangle(new Point((double)dt_Result.Rows[0].ItemArray[3], (double)dt_Result.Rows[0].ItemArray[4]), new Point((double)dt_Result.Rows[dt_Result.Rows.Count - 1].ItemArray[3], (double)dt_Result.Rows[dt_Result.Rows.Count - 1].ItemArray[4]));
             //App.global_Win_ImageShow.Refresh(dt);
@@ -118,8 +117,13 @@ namespace Microsat
             //App.global_Win_3DCube.Show();
             // App.global_Win_3DCube.Refresh(dt);
             App.global_Win_SpecImg.Show();
-            App.global_Win_SpecImg.grid.ColumnDefinitions[0].Width = new GridLength(1, GridUnitType.Star);
-            App.global_Win_SpecImg.grid.ColumnDefinitions[1].Width = new GridLength(1,GridUnitType.Star);
+            App.global_Win_SpecImg.Refresh(80,0);
+            App.global_Win_3D.Show();
+            App.global_Win_3D._3DViewer.Refresh();
+
+            //App.global_Win_SpecImg.grid.ColumnDefinitions[0].Width = new GridLength(1, GridUnitType.Star);
+            //App.global_Win_SpecImg.grid.ColumnDefinitions[1].Width = new GridLength(1,GridUnitType.Star);
+            
         }
         private void Win_Main_Closed(object sender, EventArgs e)
         {
@@ -127,7 +131,7 @@ namespace Microsat
         }
         private void button_Clear_Result_Click(object sender, RoutedEventArgs e)
         {
-            dt_Result.Clear();
+            DataQuery.QueryResult.Clear();
             dataGrid_Result.ItemsSource = null;
 
         }

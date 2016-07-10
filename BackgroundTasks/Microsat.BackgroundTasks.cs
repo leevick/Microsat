@@ -461,6 +461,7 @@ namespace Microsat.BackgroundTasks
 
         }
 
+        
 
         public static Task<string> Import(IProgress<double> Prog, IProgress<string> List, CancellationToken cancel)
         {
@@ -712,64 +713,44 @@ namespace Microsat.BackgroundTasks
 
 
     */
-        public static Task<Bitmap[]> GetBmp(DataTable dt_Result)
+        public static Task<Bitmap> GetBmp(int v)
         {
-            return Task.Run(() =>
+            return Task.Run(()=> 
+            {
+                Bitmap bmpTop = new Bitmap(2048, DataQuery.QueryResult.Rows.Count, System.Drawing.Imaging.PixelFormat.Format24bppRgb);
+                BitmapData bmpData = bmpTop.LockBits(new System.Drawing.Rectangle(0, 0, 2048, DataQuery.QueryResult.Rows.Count), System.Drawing.Imaging.ImageLockMode.WriteOnly, bmpTop.PixelFormat);
+                byte[] buf_full = new byte[2048 * DataQuery.QueryResult.Rows.Count * 3];
+                Parallel.For(0, DataQuery.QueryResult.Rows.Count, (i) => {
+                    byte[] buf_rgb = new byte[2048 * 3];
+                    Parallel.For(1, 5, k => {
+                        FileStream fs = new FileStream($"{Variables.str_pathWork}\\{(int)(DataQuery.QueryResult.Rows[i].ItemArray[14])}_{(int)(DataQuery.QueryResult.Rows[i].ItemArray[0])}_{k}.raw", FileMode.Open, FileAccess.Read, FileShare.Read);
+                        fs.Seek(v * 512 * 2, SeekOrigin.Begin);
+                        byte[] temp = new byte[512 * 2];
+                        fs.Read(temp, 0, 1024);
+                        Parallel.For(0, 512, l =>
+                        {
+                            Spectra2RGB.HsvToRgb(300 * ((double)v / 160), 1, ((double)(readU16(temp,l*2)) /65536), out buf_rgb[512 * 3 * (k - 1) + 3 * l+2], out buf_rgb[512 * 3 * (k - 1) + 3 * l + 1], out buf_rgb[512 * 3 * (k - 1) + 3 * l + 0]);
+                           // buf_rgb[512 * 4 * (k - 1) + 4 * l + 3] = 255;
+                            
+                        });
+                        fs.Close();
+                    });
+                    Array.Copy(buf_rgb, 0, buf_full, 3 * 2048 * i, 3 * 2048);
+                });
+                Marshal.Copy(buf_full, 0, bmpData.Scan0, 2048 * DataQuery.QueryResult.Rows.Count * 3);
+                bmpTop.UnlockBits(bmpData);
+                return bmpTop;
+            });
+        }
+        public static Task<Bitmap[]> GetBmp3D()
+        {
+            return Task.Run(async () =>
             {
 
                 Bitmap[] r = new Bitmap[6];
-                Thread _tTop = new Thread(new ThreadStart(() => {
-                    Bitmap bmpTop = new Bitmap(2048, dt_Result.Rows.Count);
-                    BitmapData bmpData = bmpTop.LockBits(new System.Drawing.Rectangle(0, 0, 2048, dt_Result.Rows.Count), System.Drawing.Imaging.ImageLockMode.WriteOnly, bmpTop.PixelFormat);
-                    byte[] buf_full = new byte[2048 * dt_Result.Rows.Count * 4];
-                    Parallel.For(0, dt_Result.Rows.Count, (i) => {
-                        byte[] buf_rgb = new byte[2048 * 4];
-                        Parallel.For(1, 5, k => {
-                            FileStream fs = new FileStream($"{Variables.str_pathWork}\\{(int)(dt_Result.Rows[i].ItemArray[14])}_{(int)(dt_Result.Rows[i].ItemArray[0])}_{k}.raw", FileMode.Open, FileAccess.Read, FileShare.Read);
-                            fs.Seek(0 * 512 * 2, SeekOrigin.Begin);
-                            byte[] temp = new byte[512 * 2];
-                            fs.Read(temp, 0, 1024);
 
-                            Parallel.For(0, 512, l =>
-                            {
-                                Spectra2RGB.HsvToRgb(360 * (0 / 160), 1, ((double)temp[l * 2] / 256), out buf_rgb[512 * 4 * (k - 1) + 4 * l], out buf_rgb[512 * 4 * (k - 1) + 4 * l + 1], out buf_rgb[512 * 4 * (k - 1) + 4 * l + 2]);
-                                buf_rgb[512 * 4 * (k - 1) + 4 * l + 3] = 255;
-                            });
-                            fs.Close();
-                        });
-                        Array.Copy(buf_rgb, 0, buf_full, 4 * 2048 * i, 4 * 2048);
-                    });
-                    Marshal.Copy(buf_full, 0, bmpData.Scan0, 2048 * dt_Result.Rows.Count * 4);
-                    bmpTop.UnlockBits(bmpData);
-
-                    r[0] = bmpTop;
-                }));
-                Thread _tBottom = new Thread(new ThreadStart(() => {
-                    Bitmap bmpBottom = new Bitmap(2048, dt_Result.Rows.Count);
-                    BitmapData bmpData = bmpBottom.LockBits(new System.Drawing.Rectangle(0, 0, 2048, dt_Result.Rows.Count), System.Drawing.Imaging.ImageLockMode.WriteOnly, bmpBottom.PixelFormat);
-                    byte[] buf_full = new byte[2048 * dt_Result.Rows.Count * 4];
-                    Parallel.For(0, dt_Result.Rows.Count, (i) => {
-                        byte[] buf_rgb = new byte[2048 * 4];
-                        Parallel.For(1, 5, k => {
-                            FileStream fs = new FileStream($"{Variables.str_pathWork}\\{(int)(dt_Result.Rows[i].ItemArray[14])}_{(int)(dt_Result.Rows[i].ItemArray[0])}_{k}.raw", FileMode.Open, FileAccess.Read, FileShare.Read);
-                            fs.Seek(159 * 512 * 2, SeekOrigin.Begin);
-                            byte[] temp = new byte[512 * 2];
-                            fs.Read(temp, 0, 1024);
-
-                            Parallel.For(0, 512, l =>
-                            {
-                                Spectra2RGB.HsvToRgb(360 * (160 / 160), 1, ((double)temp[l * 2] / 256), out buf_rgb[512 * 4 * (k - 1) + 4 * l], out buf_rgb[512 * 4 * (k - 1) + 4 * l + 1], out buf_rgb[512 * 4 * (k - 1) + 4 * l + 2]);
-                                buf_rgb[512 * 4 * (k - 1) + 4 * l + 3] = 255;
-                            });
-                            fs.Close();
-                        });
-                        Array.Copy(buf_rgb, 0, buf_full, 4 * 2048 * i, 4 * 2048);
-                    });
-                    Marshal.Copy(buf_full, 0, bmpData.Scan0, 2048 * dt_Result.Rows.Count * 4);
-                    bmpBottom.UnlockBits(bmpData);
-
-                    r[1] = bmpBottom;
-                }));
+                r[0] = await GetBmp(159);
+                r[1] = await GetBmp(0);
                 Thread _tUp = new Thread(new ThreadStart(() => {
                     Bitmap bmpUp = new Bitmap(2048, 160);
                     BitmapData bmpData = bmpUp.LockBits(new System.Drawing.Rectangle(0, 0, 2048, 160), System.Drawing.Imaging.ImageLockMode.WriteOnly, bmpUp.PixelFormat);
@@ -778,12 +759,12 @@ namespace Microsat.BackgroundTasks
                     Parallel.For(0, 4, k =>
                     {
                         byte[] buf_file = new byte[512 * 160 * 2];
-                        FileStream fs = new FileStream($"{Variables.str_pathWork}\\{(int)(dt_Result.Rows[0].ItemArray[14])}_{(int)(dt_Result.Rows[0].ItemArray[0])}_{k+1}.raw", FileMode.Open, FileAccess.Read, FileShare.Read);
+                        FileStream fs = new FileStream($"{Variables.str_pathWork}\\{(int)(DataQuery.QueryResult.Rows[0].ItemArray[14])}_{(int)(DataQuery.QueryResult.Rows[0].ItemArray[0])}_{k+1}.raw", FileMode.Open, FileAccess.Read, FileShare.Read);
                         fs.Read(buf_file, 0, 512 * 160 * 2);
                         Parallel.For(0, 160, i => {
                             Parallel.For(0, 512, j =>
                             {
-                                Spectra2RGB.HsvToRgb((double)i/160*360, (double)buf_file[1024 * i + 2 * j] / 255,1,out buf_full[8192*i+2048*k+4*j], out buf_full[8192 * i + 2048 * k + 4 * j+1], out buf_full[8192 * i + 2048 * k + 4 * j+2]);
+                                Spectra2RGB.HsvToRgb((double)i/160*300, (double)buf_file[1024 * i + 2 * j] / 255,1,out buf_full[8192*i+2048*k+4*j], out buf_full[8192 * i + 2048 * k + 4 * j+1], out buf_full[8192 * i + 2048 * k + 4 * j+2]);
                                 buf_full[8192 * i + 2048 * k + 4 * j + 3] = 255;
                             });
                         });
@@ -802,12 +783,12 @@ namespace Microsat.BackgroundTasks
                     Parallel.For(0, 4, k =>
                     {
                         byte[] buf_file = new byte[512 * 160 * 2];
-                        FileStream fs = new FileStream($"{Variables.str_pathWork}\\{(int)(dt_Result.Rows[dt_Result.Rows.Count-1].ItemArray[14])}_{(int)(dt_Result.Rows[dt_Result.Rows.Count - 1].ItemArray[0])}_{k + 1}.raw", FileMode.Open, FileAccess.Read, FileShare.Read);
+                        FileStream fs = new FileStream($"{Variables.str_pathWork}\\{(int)(DataQuery.QueryResult.Rows[DataQuery.QueryResult.Rows.Count-1].ItemArray[14])}_{(int)(DataQuery.QueryResult.Rows[DataQuery.QueryResult.Rows.Count - 1].ItemArray[0])}_{k + 1}.raw", FileMode.Open, FileAccess.Read, FileShare.Read);
                         fs.Read(buf_file, 0, 512 * 160 * 2);
                         Parallel.For(0, 160, i => {
                             Parallel.For(0, 512, j =>
                             {
-                                Spectra2RGB.HsvToRgb((double)i / 160 * 360, (double)buf_file[1024 * i + 2 * j] / 255, 1, out buf_full[8192 * i + 2048 * k + 4 * j], out buf_full[8192 * i + 2048 * k + 4 * j + 1], out buf_full[8192 * i + 2048 * k + 4 * j + 2]);
+                                Spectra2RGB.HsvToRgb((double)i / 160 * 300, (double)buf_file[1024 * i + 2 * j] / 255, 1, out buf_full[8192 * i + 2048 * k + 4 * j], out buf_full[8192 * i + 2048 * k + 4 * j + 1], out buf_full[8192 * i + 2048 * k + 4 * j + 2]);
                                 buf_full[8192 * i + 2048 * k + 4 * j + 3] = 255;
                             });
                         });
@@ -821,42 +802,42 @@ namespace Microsat.BackgroundTasks
 
                 }));
                 Thread _tRight = new Thread(new ThreadStart(() => {
-                    Bitmap bmpTop = new Bitmap(dt_Result.Rows.Count, 160);
-                    BitmapData bmpData = bmpTop.LockBits(new System.Drawing.Rectangle(0, 0, dt_Result.Rows.Count, 160), System.Drawing.Imaging.ImageLockMode.WriteOnly, bmpTop.PixelFormat);
-                    byte[] buf_full = new byte[160 * dt_Result.Rows.Count * 4];
-                    Parallel.For(0, dt_Result.Rows.Count, (i) => {
-                        FileStream fs = new FileStream($"{Variables.str_pathWork}\\{(int)(dt_Result.Rows[i].ItemArray[14])}_{(int)(dt_Result.Rows[dt_Result.Rows.Count-1-i].ItemArray[0])}_4.raw", FileMode.Open, FileAccess.Read, FileShare.Read);
+                    Bitmap bmpTop = new Bitmap(DataQuery.QueryResult.Rows.Count, 160);
+                    BitmapData bmpData = bmpTop.LockBits(new System.Drawing.Rectangle(0, 0, DataQuery.QueryResult.Rows.Count, 160), System.Drawing.Imaging.ImageLockMode.WriteOnly, bmpTop.PixelFormat);
+                    byte[] buf_full = new byte[160 * DataQuery.QueryResult.Rows.Count * 4];
+                    Parallel.For(0, DataQuery.QueryResult.Rows.Count, (i) => {
+                        FileStream fs = new FileStream($"{Variables.str_pathWork}\\{(int)(DataQuery.QueryResult.Rows[i].ItemArray[14])}_{(int)(DataQuery.QueryResult.Rows[DataQuery.QueryResult.Rows.Count-1-i].ItemArray[0])}_4.raw", FileMode.Open, FileAccess.Read, FileShare.Read);
                         byte[] buf_temp = new byte[512 * 160 * 2];
                         fs.Read(buf_temp, 0, 512 * 160 * 2);
                         Parallel.For(0, 160, j => {
 
-                            Spectra2RGB.HsvToRgb((double)j / 160 * 360, (double)buf_temp[j*512*2+2*511] / 255, 1, out buf_full[j * dt_Result.Rows.Count * 4 + i * 4 ], out buf_full[j * dt_Result.Rows.Count * 4 + i * 4 + 1], out buf_full[j * dt_Result.Rows.Count * 4 + i * 4 + 2]);
-                            buf_full[j * dt_Result.Rows.Count * 4 + i * 4 + 3] = 255;
+                            Spectra2RGB.HsvToRgb((double)j / 160 * 300, (double)buf_temp[j*512*2+2*511] / 255, 1, out buf_full[j * DataQuery.QueryResult.Rows.Count * 4 + i * 4 ], out buf_full[j * DataQuery.QueryResult.Rows.Count * 4 + i * 4 + 1], out buf_full[j * DataQuery.QueryResult.Rows.Count * 4 + i * 4 + 2]);
+                            buf_full[j * DataQuery.QueryResult.Rows.Count * 4 + i * 4 + 3] = 255;
 
                         });
                     });
-                    Marshal.Copy(buf_full, 0, bmpData.Scan0, 160 * dt_Result.Rows.Count * 4);
+                    Marshal.Copy(buf_full, 0, bmpData.Scan0, 160 * DataQuery.QueryResult.Rows.Count * 4);
                     bmpTop.UnlockBits(bmpData);
 
                     r[4] = bmpTop;
 
                 }));
                 Thread _tLeft = new Thread(new ThreadStart(() => {
-                    Bitmap bmpTop = new Bitmap(dt_Result.Rows.Count, 160);
-                    BitmapData bmpData = bmpTop.LockBits(new System.Drawing.Rectangle(0, 0, dt_Result.Rows.Count, 160), System.Drawing.Imaging.ImageLockMode.WriteOnly, bmpTop.PixelFormat);
-                    byte[] buf_full = new byte[160 * dt_Result.Rows.Count * 4];
-                    Parallel.For(0, dt_Result.Rows.Count, (i) => {
-                        FileStream fs = new FileStream($"{Variables.str_pathWork}\\{(int)(dt_Result.Rows[i].ItemArray[14])}_{(int)(dt_Result.Rows[i].ItemArray[0])}_1.raw", FileMode.Open, FileAccess.Read, FileShare.Read);
+                    Bitmap bmpTop = new Bitmap(DataQuery.QueryResult.Rows.Count, 160, System.Drawing.Imaging.PixelFormat.Format24bppRgb);
+                    BitmapData bmpData = bmpTop.LockBits(new System.Drawing.Rectangle(0, 0, DataQuery.QueryResult.Rows.Count, 160), System.Drawing.Imaging.ImageLockMode.WriteOnly, bmpTop.PixelFormat);
+                    byte[] buf_full = new byte[160 * DataQuery.QueryResult.Rows.Count * 4];
+                    Parallel.For(0, DataQuery.QueryResult.Rows.Count, (i) => {
+                        FileStream fs = new FileStream($"{Variables.str_pathWork}\\{(int)(DataQuery.QueryResult.Rows[i].ItemArray[14])}_{(int)(DataQuery.QueryResult.Rows[i].ItemArray[0])}_1.raw", FileMode.Open, FileAccess.Read, FileShare.Read);
                         byte[] buf_temp = new byte[512 * 160 * 2];
                         fs.Read(buf_temp, 0, 512 * 160 * 2);
                         Parallel.For(0, 160, j => {
 
-                            Spectra2RGB.HsvToRgb((double)j / 160 * 360, (double)buf_temp[j * 512 * 2 + 0] / 255, 1, out buf_full[j * dt_Result.Rows.Count * 4 + i * 4], out buf_full[j * dt_Result.Rows.Count * 4 + i * 4 + 1], out buf_full[j * dt_Result.Rows.Count * 4 + i * 4 + 2]);
-                            buf_full[j * dt_Result.Rows.Count * 4 + i * 4 + 3] = 255;
+                            Spectra2RGB.HsvToRgb((double)j / 160 * 300, (double)buf_temp[j * 512 * 2 + 0] / 255, 1, out buf_full[j * DataQuery.QueryResult.Rows.Count * 4 + i * 4], out buf_full[j * DataQuery.QueryResult.Rows.Count * 4 + i * 4 + 1], out buf_full[j * DataQuery.QueryResult.Rows.Count * 4 + i * 4 + 2]);
+                            buf_full[j * DataQuery.QueryResult.Rows.Count * 4 + i * 4 + 3] = 255;
 
                         });
                     });
-                    Marshal.Copy(buf_full, 0, bmpData.Scan0, 160 * dt_Result.Rows.Count * 4);
+                    Marshal.Copy(buf_full, 0, bmpData.Scan0, 160 * DataQuery.QueryResult.Rows.Count * 4);
                     bmpTop.UnlockBits(bmpData);
 
                     r[5] = bmpTop;
@@ -864,11 +845,8 @@ namespace Microsat.BackgroundTasks
 
                 }));
 
-                _tTop.Start();
-                _tBottom.Start();
+
                 _tUp.Start();
-                _tTop.Join();
-                _tBottom.Join();
                 _tUp.Join();
                 _tDown.Start();
                 _tDown.Join();
@@ -881,7 +859,10 @@ namespace Microsat.BackgroundTasks
             });
         }
 
-        public static Task<double[,]> GetChart(DataTable dt_Result)
+
+        
+
+        public static Task<double[,]> GetChart()
         {
             return Task.Run(()=> {
                 double[,] result = new double[160, 2];

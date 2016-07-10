@@ -9,8 +9,8 @@
     <Grid x:Name="grid_Image" Width="auto" Height="auto" Background="Black">
         <Grid.Resources>
             <TransformGroup x:Key="Imageview">
-                <ScaleTransform/>
-                <TranslateTransform/>
+                <ScaleTransform x:Name="ScaleTrans"/>
+                <TranslateTransform x:Name="TransTrans"/>
             </TransformGroup>
         </Grid.Resources>
         <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Disabled" Background="Wheat"   Cursor="Cross"

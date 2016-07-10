@@ -14,6 +14,12 @@ using System.Configuration;
 
 namespace Microsat.Shared
 {
+
+    public static class DataQuery
+    {
+        public static DataTable QueryResult=new DataTable();
+    }
+
     public static class Variables
     {
         public static string str_FilePath;
