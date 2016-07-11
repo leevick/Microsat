@@ -115,6 +115,9 @@
       <DependentUpon>Ctrl_ImageView.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="UserControls\Ctrl_ImageViewConfig.xaml.cs">
+      <DependentUpon>Ctrl_ImageViewConfig.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UserControls\Ctrl_SpecCurv.xaml.cs">
       <DependentUpon>Ctrl_SpecCurv.xaml</DependentUpon>
     </Compile>
@@ -144,6 +147,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UserControls\Ctrl_ImageView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserControls\Ctrl_ImageViewConfig.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -6,6 +6,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Microsat"
+        xmlns:uc="clr-namespace:Microsat.UserControls"
         xmlns:System="clr-namespace:System;assembly=mscorlib" x:Name="Win_Main" x:Class="Microsat.MainWindow"
         mc:Ignorable="d"
         Title="MainWindow" Height="1080" Width="1920" ResizeMode="NoResize" ScrollViewer.VerticalScrollBarVisibility="Disabled" WindowStartupLocation="CenterScreen" Icon="../Resources/Flat-Icons.com-Flat-Satellite.ico" WindowStyle="None" Closed="Win_Main_Closed" WindowState="Maximized" >
@@ -278,7 +279,7 @@
                         <ColumnDefinition Width="2*"/>
                     </Grid.ColumnDefinitions>
                     <StackPanel>
-                        <GroupBox x:Name="groupBox" Header="显示模式" FontSize="24" Margin="20,0" d:LayoutOverrides="LeftPosition, RightPosition, TopPosition, BottomPosition">
+                        <GroupBox x:Name="groupBox" Header="显示模式" FontSize="24" Margin="20,20,20,0" d:LayoutOverrides="LeftPosition, RightPosition, TopPosition, BottomPosition">
                             <StackPanel Margin="0">
                                 <DockPanel Height="50" LastChildFill="False">
                                     <TextBlock x:Name="textBlock13" TextWrapping="Wrap" VerticalAlignment="Center" Margin="20,0,0,0" FontSize="24"><Run Text="分"/><Run Text="窗"/><Run Text="模式："/></TextBlock>
@@ -290,19 +291,7 @@
                                 </DockPanel>
                             </StackPanel>
                         </GroupBox>
-                        <GroupBox x:Name="groupBox3" Header="窗 1 设置" FontSize="24" d:LayoutOverrides="Width, LeftPosition, RightPosition, TopPosition, BottomPosition" Margin="20,0">
-                            <StackPanel Margin="0">
-                                <DockPanel Height="50" LastChildFill="False">
-                                    <RadioButton x:Name="radioButton" Content="指定谱段" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="55,0,0,0"/>
-                                    <RadioButton x:Name="radioButton_Copy" Content="3D坐标" VerticalAlignment="Center" Margin="55,10.26,0,10.26" HorizontalAlignment="Left"/>
-                                    <RadioButton x:Name="radioButton_Copy1" Content="彩色合成" VerticalAlignment="Center" Margin="55,10.26,0,10.26" HorizontalAlignment="Left"/>
-                                </DockPanel>
-                                <DockPanel Height="50" LastChildFill="False">
-                                    <TextBlock x:Name="textBlock14" TextWrapping="Wrap" Text="谱段：" VerticalAlignment="Center"/>
-                                    <xctk:IntegerUpDown VerticalAlignment="Center"></xctk:IntegerUpDown>
-                                </DockPanel>
-                            </StackPanel>
-                        </GroupBox>
+                        <uc:Ctrl_ImageViewConfig/>
                     </StackPanel>
                 </Grid>
             </TabItem>
