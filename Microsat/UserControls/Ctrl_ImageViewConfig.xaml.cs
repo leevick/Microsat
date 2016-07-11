@@ -23,7 +23,14 @@ namespace Microsat.UserControls
 
     public partial class Ctrl_ImageViewConfig : UserControl
     {
-
+        private int _ScreenIndex;
+        public int ScreenIndex
+        {
+            get { return _ScreenIndex; }
+            set { _ScreenIndex = value;
+                this.groupBox3.Header = $"窗 {_ScreenIndex+1} 设置";
+            }
+        }
         public Ctrl_ImageViewConfig()
         {
             InitializeComponent();

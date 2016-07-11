@@ -18,6 +18,7 @@ using Microsat.BackgroundTasks;
 using Microsat.Shared;
 using System.Threading;
 using System.Data;
+using Microsat.UserControls;
 
 namespace Microsat
 {
@@ -31,6 +32,16 @@ namespace Microsat
             InitializeComponent();
             this.Top = Variables.Screen_Locations[0].Y;
             this.Left = Variables.Screen_Locations[0].X;
+            WindowSetting[0] = this.Setting_Window_1;
+            WindowSetting[1] = this.Setting_Window_2;
+            WindowSetting[2] = this.Setting_Window_3;
+            WindowSetting[3] = this.Setting_Window_4;
+            WindowSetting[0].groupBox3.IsEnabled = true;
+            for(int i=0;i<4;i++){
+                WindowSetting[i].ScreenIndex = i;
+            }
+            
+
         }
 
 
@@ -378,12 +389,38 @@ namespace Microsat
 
         #endregion
 
+        #region 光谱分析界面
+
+        Ctrl_ImageViewConfig[] WindowSetting= new Ctrl_ImageViewConfig[4];
+
+
         private void comboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if(App.global_Win_SpecImg != null)
             {
                 App.global_Win_SpecImg.DisplayMode = (Windows.Window_SpecImg.GridMode)comboBox.SelectedIndex;
             }
+
+
+            foreach (Ctrl_ImageViewConfig c in WindowSetting)
+            {
+                if (c.ScreenIndex <= comboBox.SelectedIndex)
+                {
+                    c.groupBox3.IsEnabled = true;
+                }
+                else
+                {
+                    c.groupBox3.IsEnabled = false;
+                }
+            }
+            
+        }
+
+        #endregion
+
+        private void Grid_Loaded_1(object sender, RoutedEventArgs e)
+        {
+            comboBox.SelectionChanged += comboBox_SelectionChanged;
         }
     }
 }

@@ -69,7 +69,7 @@ namespace Microsat.Windows
             u[3] = ImageView_D;
             DisplayMode = GridMode.Two;
         }
-        public enum GridMode { One,Two,Four};
+        public enum GridMode { One,Two,Three,Four};
         public async void Refresh(int v,int i)
         {
             Bitmap bmp = await DataProc.GetBmp(v);

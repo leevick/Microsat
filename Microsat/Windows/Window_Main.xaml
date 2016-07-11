@@ -273,7 +273,7 @@
                 </Grid>
             </TabItem>
             <TabItem d:LayoutOverrides="Height, LeftMargin, RightMargin" Width="208" Margin="0,-1,0,0" Height="100" FontSize="32" Header="光谱分析" VerticalAlignment="Top">
-                <Grid Background="#FFE5E5E5">
+                <Grid Background="#FFE5E5E5" Loaded="Grid_Loaded_1">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="1*"/>
                         <ColumnDefinition Width="2*"/>
@@ -283,15 +283,19 @@
                             <StackPanel Margin="0">
                                 <DockPanel Height="50" LastChildFill="False">
                                     <TextBlock x:Name="textBlock13" TextWrapping="Wrap" VerticalAlignment="Center" Margin="20,0,0,0" FontSize="24"><Run Text="分"/><Run Text="窗"/><Run Text="模式："/></TextBlock>
-                                    <ComboBox x:Name="comboBox" VerticalAlignment="Center" Margin="20,0,0,0" SelectedIndex="0" FontSize="24" SelectionChanged="comboBox_SelectionChanged">
+                                    <ComboBox x:Name="comboBox" VerticalAlignment="Center" Margin="20,0,0,0" SelectedIndex="0" FontSize="24">
                                         <ComboBoxItem Content="1窗显示"/>
                                         <ComboBoxItem Content="2窗显示"/>
+                                        <ComboBoxItem Visibility="Collapsed"/>
                                         <ComboBoxItem Content="4窗显示"/>
                                     </ComboBox>
                                 </DockPanel>
                             </StackPanel>
                         </GroupBox>
-                        <uc:Ctrl_ImageViewConfig/>
+                        <uc:Ctrl_ImageViewConfig x:Name="Setting_Window_1"/>
+                        <uc:Ctrl_ImageViewConfig x:Name="Setting_Window_2"/>
+                        <uc:Ctrl_ImageViewConfig x:Name="Setting_Window_3"/>
+                        <uc:Ctrl_ImageViewConfig x:Name="Setting_Window_4"/>
                     </StackPanel>
                 </Grid>
             </TabItem>

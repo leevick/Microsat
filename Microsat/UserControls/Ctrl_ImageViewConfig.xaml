@@ -7,12 +7,12 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Microsat.UserControls"
              mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="300">
+             d:DesignHeight="300" d:DesignWidth="700">
     <Grid>
-        <GroupBox x:Name="groupBox3" Header="窗 1 设置" FontSize="24" d:LayoutOverrides="Width, LeftPosition, RightPosition, TopPosition, BottomPosition" Margin="20,20,20,0">
+        <GroupBox x:Name="groupBox3" Header="窗 1 设置" FontSize="24" d:LayoutOverrides="Width, LeftPosition, RightPosition, TopPosition, BottomPosition" Margin="20,20,20,0" IsEnabled="False">
             <StackPanel Margin="0">
                 <DockPanel Height="50" LastChildFill="False">
-                    <RadioButton x:Name="radioButton" Content="指定谱段" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="20,0,0,0"/>
+                    <RadioButton x:Name="radioButton" Content="指定谱段" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="20,0,0,0" IsChecked="True"/>
                     <RadioButton x:Name="radioButton_Copy" Content="3D坐标" VerticalAlignment="Center" Margin="20,10.26,0,10.26" HorizontalAlignment="Left"/>
                     <RadioButton x:Name="radioButton_Copy1" Content="彩色合成" VerticalAlignment="Center" Margin="20,10.26,0,10.26" HorizontalAlignment="Left"/>
                     <TextBlock x:Name="textBlock15" TextWrapping="Wrap" Text="位深：" VerticalAlignment="Center" Margin="20,0,0,0"/>
@@ -29,12 +29,14 @@
                     <ProgressBar VerticalAlignment="Center" Width="392" HorizontalAlignment="Left" Margin="20,8,0,8" Height="30"/>
                 </DockPanel>
                 <DockPanel Height="50" LastChildFill="False">
-                    <TextBlock x:Name="textBlock14_Copy" TextWrapping="Wrap" VerticalAlignment="Center" Margin="59,9.76,0,9.24"><Run Text="   R "/><Run Text="："/></TextBlock>
-                    <xctk:IntegerUpDown VerticalAlignment="Center" Maximum="160" Minimum="1" DefaultValue="80" Text="80" Margin="0,8"/>
-                    <TextBlock x:Name="textBlock14_Copy1" TextWrapping="Wrap" VerticalAlignment="Center" Margin="59,9.76,0,9.24"><Run Text="G"/><Run Text="："/></TextBlock>
-                    <xctk:IntegerUpDown VerticalAlignment="Center" Maximum="160" Minimum="1" DefaultValue="80" Text="80" Margin="0,8"/>
-                    <TextBlock x:Name="textBlock14_Copy2" TextWrapping="Wrap" VerticalAlignment="Center" Margin="59,9.76,0,9.24"><Run Text="B"/><Run Text="："/></TextBlock>
-                    <xctk:IntegerUpDown VerticalAlignment="Center" Maximum="160" Minimum="1" DefaultValue="80" Text="80" Margin="0,8"/>
+                    <TextBlock x:Name="textBlock14_Copy" TextWrapping="Wrap" VerticalAlignment="Center" Margin="20,9.76,0,9.24"><Run Text="R"/><Run Text=":"/></TextBlock>
+                    <xctk:IntegerUpDown VerticalAlignment="Center" Maximum="160" Minimum="1" DefaultValue="80" Text="80" Margin="10,8,0,8" Width="65"/>
+                    <TextBlock x:Name="textBlock14_Copy1" TextWrapping="Wrap" VerticalAlignment="Center" Margin="20,9.76,0,9.24"><Run Text="G"/><Run Text=":"/></TextBlock>
+                    <xctk:IntegerUpDown VerticalAlignment="Center" Maximum="160" Minimum="1" DefaultValue="80" Text="80" Margin="10,8,0,8" Width="65"/>
+                    <TextBlock x:Name="textBlock14_Copy2" TextWrapping="Wrap" VerticalAlignment="Center" Margin="20,9.76,0,9.24"><Run Text="B"/><Run Text=":"/></TextBlock>
+                    <xctk:IntegerUpDown VerticalAlignment="Center" Maximum="160" Minimum="1" DefaultValue="80" Text="80" Margin="10,8,0,8" Width="65"/>
+                    <Button x:Name="button" Content="刷新图像" VerticalAlignment="Center" Margin="10,0,0,0"/>
+                    <Button x:Name="button_Copy" Content="保存图像" VerticalAlignment="Center" Margin="10,8,0,8"/>
                 </DockPanel>
             </StackPanel>
         </GroupBox>
