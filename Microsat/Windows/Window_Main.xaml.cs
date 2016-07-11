@@ -128,7 +128,7 @@ namespace Microsat
             //App.global_Win_3DCube.Show();
             // App.global_Win_3DCube.Refresh(dt);
             App.global_Win_SpecImg.Show();
-            App.global_Win_SpecImg.Refresh(80,0);
+            //App.global_Win_SpecImg.Refresh(80,0);
             App.global_Win_3D.Show();
             App.global_Win_3D._3DViewer.Refresh();
 

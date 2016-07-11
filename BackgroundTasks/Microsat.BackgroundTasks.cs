@@ -461,7 +461,36 @@ namespace Microsat.BackgroundTasks
 
         }
 
-        
+        public static Task<Bitmap> GetBmp(int v, IProgress<double> progress_Prog)
+        {
+            return Task.Run(() =>
+            {
+                Bitmap bmpTop = new Bitmap(2048, DataQuery.QueryResult.Rows.Count, System.Drawing.Imaging.PixelFormat.Format24bppRgb);
+                BitmapData bmpData = bmpTop.LockBits(new System.Drawing.Rectangle(0, 0, 2048, DataQuery.QueryResult.Rows.Count), System.Drawing.Imaging.ImageLockMode.WriteOnly, bmpTop.PixelFormat);
+                byte[] buf_full = new byte[2048 * DataQuery.QueryResult.Rows.Count * 3];
+                Parallel.For(0, DataQuery.QueryResult.Rows.Count, (i) => {
+                    progress_Prog.Report((double)i/DataQuery.QueryResult.Rows.Count);
+                    byte[] buf_rgb = new byte[2048 * 3];
+                    Parallel.For(1, 5, k => {
+                        FileStream fs = new FileStream($"{Variables.str_pathWork}\\{(int)(DataQuery.QueryResult.Rows[i].ItemArray[14])}_{(int)(DataQuery.QueryResult.Rows[i].ItemArray[0])}_{k}.raw", FileMode.Open, FileAccess.Read, FileShare.Read);
+                        fs.Seek(v * 512 * 2, SeekOrigin.Begin);
+                        byte[] temp = new byte[512 * 2];
+                        fs.Read(temp, 0, 1024);
+                        Parallel.For(0, 512, l =>
+                        {
+                            Spectra2RGB.HsvToRgb(300 * ((double)v / 160), 1, ((double)(readU16(temp, l * 2)) / 65536), out buf_rgb[512 * 3 * (k - 1) + 3 * l + 2], out buf_rgb[512 * 3 * (k - 1) + 3 * l + 1], out buf_rgb[512 * 3 * (k - 1) + 3 * l + 0]);
+                            // buf_rgb[512 * 4 * (k - 1) + 4 * l + 3] = 255;
+
+                        });
+                        fs.Close();
+                    });
+                    Array.Copy(buf_rgb, 0, buf_full, 3 * 2048 * i, 3 * 2048);
+                });
+                Marshal.Copy(buf_full, 0, bmpData.Scan0, 2048 * DataQuery.QueryResult.Rows.Count * 3);
+                bmpTop.UnlockBits(bmpData);
+                return bmpTop;
+            });
+        }
 
         public static Task<string> Import(IProgress<double> Prog, IProgress<string> List, CancellationToken cancel)
         {

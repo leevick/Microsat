@@ -221,11 +221,14 @@ namespace Microsat.UserControls
 
         internal async void Refresh()
         {
+            this.Busy.isBusy = true;
             Bitmap[] bmp = await DataProc.GetBmp3D();
             imheight = DataQuery.QueryResult.Rows.Count;
             //InitializeScene(brush);
             RenderBox(imheight, bmp);
             InitializeCameras();
+
+            this.Busy.isBusy=false;
             //InitializeInfo();
 
         }
@@ -469,7 +472,7 @@ namespace Microsat.UserControls
             this.tb_3DCoord.Text = $"({X},{Y},{Z})";
             if (IsValid(ref X,ref Y,ref Z))
             {
-                App.global_Win_SpecImg.Refresh(Z, 1);
+                //App.global_Win_SpecImg.Refresh(Z, 1);
                 
             }
             

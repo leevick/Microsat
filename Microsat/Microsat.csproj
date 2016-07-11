@@ -111,6 +111,9 @@
     <Compile Include="UserControls\Ctrl_3DView.xaml.cs">
       <DependentUpon>Ctrl_3DView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UserControls\Ctrl_BusyMask.xaml.cs">
+      <DependentUpon>Ctrl_BusyMask.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UserControls\Ctrl_ImageView.xaml.cs">
       <DependentUpon>Ctrl_ImageView.xaml</DependentUpon>
       <SubType>Code</SubType>
@@ -143,6 +146,10 @@
       <DependentUpon>Window_SpecImg.xaml</DependentUpon>
     </Compile>
     <Page Include="UserControls\Ctrl_3DView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserControls\Ctrl_BusyMask.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

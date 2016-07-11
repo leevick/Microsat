@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsat.BackgroundTasks;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
@@ -46,8 +47,11 @@ namespace Microsat
            // this.IMG1.Source = bmp;
         }
 
-        internal void Refresh(Bitmap bmp)
+        public async void Refresh(int band, UserControls.Ctrl_ImageViewConfig.RenderMode mode,int[]RGB)
         {
+            this.Busy.isBusy = true;
+            
+            Bitmap bmp = await DataProc.GetBmp(band);
             MemoryStream ms = new MemoryStream();
             bmp.Save(ms, System.Drawing.Imaging.ImageFormat.Bmp);
             BitmapImage bmpSource = new BitmapImage();
@@ -55,6 +59,7 @@ namespace Microsat
             bmpSource.StreamSource = ms;
             bmpSource.EndInit();
             this.IMG1.Source = bmpSource;
+            this.Busy.isBusy = false;
             
         }
 

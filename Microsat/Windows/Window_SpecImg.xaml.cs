@@ -22,7 +22,7 @@ namespace Microsat.Windows
     /// </summary>
     public partial class Window_SpecImg : Window
     {
-        Ctrl_ImageView[] u = new Ctrl_ImageView[4];
+        public Ctrl_ImageView[] u = new Ctrl_ImageView[4];
         List<Bitmap> bmp_Buf = new List<Bitmap>();
         private GridMode _DisplayMode;
         public GridMode DisplayMode
@@ -67,15 +67,10 @@ namespace Microsat.Windows
             u[1] = ImageView_B;
             u[2] = ImageView_C;
             u[3] = ImageView_D;
-            DisplayMode = GridMode.Two;
+            DisplayMode = GridMode.One;
         }
         public enum GridMode { One,Two,Three,Four};
-        public async void Refresh(int v,int i)
-        {
-            Bitmap bmp = await DataProc.GetBmp(v);
-            u[i].Refresh(bmp);
-
-        }
+ 
 
         private void Window_Closed(object sender, EventArgs e)
         {
