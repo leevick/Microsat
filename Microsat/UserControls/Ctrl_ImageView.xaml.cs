@@ -27,7 +27,7 @@ namespace Microsat
         /// 图片名称
         /// </summary>
         public string Title;
-
+        public int ScreenIndex;
         public enum DisplayContent { Single,Pick,Sync};
         public int SpecNum;
         public int[] RgbSpec=new int[3];
@@ -143,11 +143,37 @@ namespace Microsat
 
         private void IMG1_MouseDown(object sender, MouseButtonEventArgs e)
         {
+
+            IMG1.MouseDown -= IMG1_MouseDown;
             System.Windows.Point p = Mouse.GetPosition(e.Source as FrameworkElement);
-            UInt16 x = (UInt16)p.X;
-            UInt16 y = (UInt16)p.Y;
-            txtPosi.Text = "x:" + x.ToString() + "y:" + y.ToString();
+            p.X = (p.X/IMG1.ActualWidth);
+            p.Y = (p.Y / IMG1.ActualHeight);
+            txtPosi.Text = "x:" + p.X.ToString() + "y:" + p.X.ToString();
+
+            App.global_Win_Curve.u[this.ScreenIndex].Draw(p);
+            IMG1.MouseDown += IMG1_MouseDown;
+
         }
+
+
+        /*
+
+        private async void image_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+
+           
+            dtsChart1st = new ObservableDataSource<System.Windows.Point>();
+            foreach (System.Windows.Point point in points)
+            {
+                dtsChart1st.AppendAsync(base.Dispatcher, point);
+            }
+            chart1st.Children.Remove(lm.LineGraph);
+            chart1st.Children.Remove(lm.MarkerGraph);
+            initChart();
+            this.image.MouseLeftButtonUp += image_MouseLeftButtonUp;
+        }
+
+    */
 
     }
 }

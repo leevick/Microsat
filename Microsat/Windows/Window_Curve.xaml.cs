@@ -20,9 +20,9 @@ namespace Microsat.Windows
     /// <summary>
     /// Window_SpecImg.xaml 的交互逻辑
     /// </summary>
-    public partial class Window_Split : Window
+    public partial class Window_Curve : Window
     {
-        public UserControl[] u = new UserControl[4];
+        public Ctrl_SpecCurv[] u = new Ctrl_SpecCurv[4];
         private GridMode _DisplayMode;
         public GridMode DisplayMode
         {
@@ -59,11 +59,20 @@ namespace Microsat.Windows
                 }
             }
         }
-        public Window_Split()
+        public Window_Curve()
         {
             InitializeComponent();
-            DisplayMode = GridMode.Two;
+            DisplayMode = GridMode.Four;
+            u[0] = this.Curve_1;
+            u[1] = this.Curve_2;
+            u[2] = this.Curve_3;
+            u[3] = this.Curve_4;
+            u[0].ScreenIndex = 0;
+            u[1].ScreenIndex = 1;
+            u[2].ScreenIndex = 2;
+            u[3].ScreenIndex = 3;
         }
+
         public enum GridMode { One,Two,Four};
         private void Window_Closed(object sender, EventArgs e)
         {

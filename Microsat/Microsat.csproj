@@ -135,8 +135,8 @@
     <Compile Include="Windows\Window_SpecCurv.xaml.cs">
       <DependentUpon>Window_SpecCurv.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Windows\Window_Split.xaml.cs">
-      <DependentUpon>Window_Split.xaml</DependentUpon>
+    <Compile Include="Windows\Window_Curve.xaml.cs">
+      <DependentUpon>Window_Curve.xaml</DependentUpon>
     </Compile>
     <Compile Include="Windows\Window_SpecImg.xaml.cs">
       <DependentUpon>Window_SpecImg.xaml</DependentUpon>
@@ -202,7 +202,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Windows\Window_Split.xaml">
+    <Page Include="Windows\Window_Curve.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

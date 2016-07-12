@@ -108,7 +108,7 @@ namespace Microsat
             p.X = p.X / this.image.Source.Width;
             p.Y = p.Y / this.image.Source.Height;
             this.image.MouseLeftButtonUp -= image_MouseLeftButtonUp;
-            System.Windows.Point[] points = await BackgroundTasks.SpecProc.GetSpecCurv(ImportId,FrmCnt_Start,FrmCnt_End,80,p);
+            System.Windows.Point[] points = await BackgroundTasks.SpecProc.GetSpecCurv(p);
             dtsChart1st = new ObservableDataSource<System.Windows.Point>();
             foreach (System.Windows.Point point in points)
             {

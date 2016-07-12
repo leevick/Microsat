@@ -81,7 +81,6 @@ namespace Microsat
         #endregion
 
         #region 数据分析显示界面
-
         #region 局部变量
         public DateTime start_time; //起始检索时刻
         public DateTime end_time;   //终止检索时刻
@@ -111,12 +110,6 @@ namespace Microsat
         {
             this.Close();
         }
-        private async void b_Find_Click(object sender, RoutedEventArgs e)
-        {
-            DataTable dt = await DataProc.QueryResult();
-            this.dataGrid.ItemsSource = dt.DefaultView;
-            System.Windows.MessageBox.Show("显示完成！");
-        }
         private void button_Display_Click(object sender, RoutedEventArgs e)
         {
 
@@ -127,10 +120,12 @@ namespace Microsat
             //App.global_Win_ImageShow.Show();
             //App.global_Win_3DCube.Show();
             // App.global_Win_3DCube.Refresh(dt);
-            App.global_Win_SpecImg.Show();
+             App.global_Win_SpecImg.Show();
             //App.global_Win_SpecImg.Refresh(80,0);
-            App.global_Win_3D.Show();
-            App.global_Win_3D._3DViewer.Refresh();
+            //App.global_Win_3D.Show();
+            // App.global_Win_3D._3DViewer.Refresh();
+
+            App.global_Win_Curve.Show();
 
             //App.global_Win_SpecImg.grid.ColumnDefinitions[0].Width = new GridLength(1, GridUnitType.Star);
             //App.global_Win_SpecImg.grid.ColumnDefinitions[1].Width = new GridLength(1,GridUnitType.Star);

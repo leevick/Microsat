@@ -67,6 +67,10 @@ namespace Microsat.Windows
             u[1] = ImageView_B;
             u[2] = ImageView_C;
             u[3] = ImageView_D;
+            u[0].ScreenIndex = 0;
+            u[1].ScreenIndex = 1;
+            u[2].ScreenIndex = 2;
+            u[3].ScreenIndex = 3;
             DisplayMode = GridMode.One;
         }
         public enum GridMode { One,Two,Three,Four};

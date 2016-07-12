@@ -21,6 +21,7 @@ namespace Microsat
         public static Window_3DCube global_Win_3DCube;
         public static Window_SpecImg global_Win_SpecImg;
         public static Window_3D global_Win_3D;
+        public static Window_Curve global_Win_Curve;
 
         private void Application_Startup(object sender, StartupEventArgs e)
         {
@@ -37,7 +38,8 @@ namespace Microsat
             global_Win_3DCube = new Window_3DCube();
             global_Win_SpecImg = new Window_SpecImg();
             global_Win_3D = new Window_3D();
-            
+            global_Win_Curve = new Window_Curve();
+
             //global_Win_Map.Show();
             //global_Win_ImageShow.Show();
         }

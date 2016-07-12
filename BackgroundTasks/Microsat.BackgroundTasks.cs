@@ -24,6 +24,64 @@ namespace Microsat.BackgroundTasks
 {
     public class DataProc
     {
+        #region File Operations
+
+
+
+
+        public static Task<string> Import_3(IProgress<double> Prog, IProgress<string> List, CancellationToken cancel)
+        {
+            return Task.Run(()=> 
+            {
+                try
+                {
+                    SQLiteConnection conn = new SQLiteConnection(Variables.dbConString);
+                    conn.Open();
+                    SQLiteCommand cmd = new SQLiteCommand("INSERT INTO Import_History (FileName)VALUES(\"" + Variables.str_FilePath + "\")", conn);
+                    cmd.ExecuteNonQuery();
+                    cmd.CommandText = "SELECT ID from Import_History ORDER BY id DESC";
+                    long import_id = (long)(cmd.ExecuteScalar());
+                    FileStream fs_input = new FileStream(Variables.str_FilePath, FileMode.Open, FileAccess.Read, FileShare.Read);
+                    long total_rows = fs_input.Length / 288;
+                    Parallel.For(0, total_rows, i =>
+                    {
+
+                        FileStream fs_temp = new FileStream(Variables.str_FilePath, FileMode.Open, FileAccess.Read, FileShare.Read);
+                        fs_temp.Seek(288*i,SeekOrigin.Begin);
+                        byte[] buf_row= new byte[280];
+                        /*
+                        if (buf_row[4] == 0x0A && buf_row[5] == 0x01)
+                        {
+                            RealDataRow rdl = new RealDataRow(buf_row, import_id);
+                            string cmdline = $"分包中...\n帧编号：{rdl.FrameCount}";
+                            //d_progress = (double)fs_chanel.Position / fs_chanel.Length;
+                            rdl.Insert();
+                        }
+                        */
+
+                        /*if (fs_chanel.Position % (288 * 1024) == 0)
+                        {
+                            Prog.Report(d_progress);
+                            List.Report(cmdline);
+                        }
+
+    */
+
+
+                    });
+
+                    
+
+
+                }
+                catch (Exception e)
+                {
+                    return e.Message;
+                }
+                return "Decode Normally!";
+            });
+        }
+
         public static Task<string> Import_4(IProgress<double> Prog, IProgress<string> List, CancellationToken cancel)
         {
             return Task.Run(() =>
@@ -461,7 +519,9 @@ namespace Microsat.BackgroundTasks
             });
 
         }
+        #endregion
 
+        #region Bitmap Operations
         public static Task<Bitmap> GetBmp(int v, IProgress<double> progress_Prog)
         {
             return Task.Run(() =>
@@ -493,256 +553,6 @@ namespace Microsat.BackgroundTasks
             });
         }
 
-        public static Task<string> Import(IProgress<double> Prog, IProgress<string> List, CancellationToken cancel)
-        {
-            return Task.Run(() =>
-            {
-                try
-                {
-                    FileStream fs_Import = new FileStream(Variables.str_FilePath, FileMode.Open);
-                    double file_length = fs_Import.Length;
-                    byte[] buf_row = new byte[288];
-                    AuxData Aux = new AuxData(ref buf_row);
-                    SQLiteConnection conn = new SQLiteConnection(Variables.dbConString);
-                    conn.Open();
-                    SQLiteCommand cmd = new SQLiteCommand("INSERT INTO Import_History (FileName)VALUES(\"" + Variables.str_FilePath + "\")", conn);
-                    SQLiteDatabase db = new SQLiteDatabase(Variables.dbPath);
-                    cmd.ExecuteNonQuery();
-                    cmd.CommandText = "SELECT ID from Import_History ORDER BY id DESC";
-                    int import_id = (int)(cmd.ExecuteScalar());
-
-                    while (fs_Import.Position < fs_Import.Length)
-                    {
-                        fs_Import.Read(buf_row, 0, 288);
-                        if (buf_row[4] == 0x08 && buf_row[5] == 0x01)
-                        {
-                            Aux = new AuxData(ref buf_row);
-                            if (!Aux.Insert(import_id)) throw (new Exception("数据库写入失败！"));
-                            
-                        }
-                        else if (buf_row[4] == 0x0A)
-                        {
-
-                            RealDataRow rdl = new RealDataRow(buf_row,import_id);
-
-                            ThreadPool.QueueUserWorkItem(o=> { rdl.Insert(); });
-                            
-                            
-                            
-
-                            //cmd.CommandText = $"insert into Temp values ({import_id},{AuxData.readU16(buf_row, 6)},{ AuxData.readU8(buf_row, 5)},{ (fs_Import.Position / 288 - 1)},{ AuxData.readU16(buf_row, 8)})";
-                            //cmd.ExecuteNonQuery();
-                        }
-                        else continue;
-
-                        if (fs_Import.Position % (288 * 1024) == 0)
-                        {
-                            Prog.Report((double)fs_Import.Position / file_length);
-                            List.Report(Aux.ToString());
-                        }
-                           
-                        cancel.ThrowIfCancellationRequested();
-                    }
-
-                    /*
-
-                    DataTable dt = db.GetDataTable("SELECT distinct FrameId From AuxData WHERE ImportId=" + import_id.ToString());
-                    
-
-
-                    byte[] buf_Image = new byte[256];
-              
-                        foreach (DataRow dr in dt.Rows)
-                        {
-                         int progint = 0;
-                         int FrmCnt = (int)(dr.ItemArray[0]);
-
-                        cmd.CommandText = "SELECT COUNT(*) FROM (SELECT distinct Chanel FROM Temp WHERE FrmCnt=" + ((int)(dr.ItemArray[0])).ToString() + " AND ImportId="+import_id.ToString()+")";
-                        if ((int)cmd.ExecuteScalar() == 4)
-                        {
-                            SQLiteDatabase db2 = new SQLiteDatabase(Variables.dbPath);
-                            MemoryStream[] ms = new MemoryStream[4];
-
-                            byte[] bufferBMP = new byte[2048 * 160 * 2];
-                            byte[] bufferJP2 = new byte[512 * 160 * 2];
-                            for (int i = 0; i < 4; i++)
-                            {
-                               
-                                SQLiteCommand cmd2 = new SQLiteCommand("SELECT [Position] FROM [Temp] WHERE [FrmCnt]=" + ((int)(dr.ItemArray[0])).ToString() + " and [ImportId] =" + import_id.ToString() + " and [Chanel]=" + (i + 1).ToString() + " ORDER BY [PackCnt] ASC", conn);
-                                SQLiteDataReader reader2 = cmd2.ExecuteReader();
-                                DataTable dt2 = new DataTable();
-                                dt2.Load(reader2);
-
-                                
-                                ms[i] = new MemoryStream(dt2.Rows.Count*256);
-                                foreach (DataRow dr2 in dt2.Rows)
-                                {
-                                    fs_Import.Position = (int)dr2.ItemArray[0] * 288 + 16;
-                                    fs_Import.Read(buf_Image, 0, 256);
-                                    ms[i].Write(buf_Image, 0, 256);
-                                    
-                                }
-
-                                ms[i] = new MemoryStream(ms[i].GetBuffer(),16,ms[i].GetBuffer().Length-16);
-
-                            }
-
-
- 
-                        
-                        for(int i=0;i<4;i++)
-                        {
-                            FIBITMAP dib = FreeImage.LoadFromStream(ms[i]);
-                            Marshal.Copy(FreeImage.GetBits(dib), bufferJP2, 0, 512 * 160 * 2);
-                            for (int j = 0; j < 160; j++)
-                            {
-                                for (int k = 0; k < 512; k++)
-                                {
-                                    bufferBMP[2 * (j * 2048 + k + i  * 512)] = bufferJP2[2 * (j * 512 + k)];
-                                    bufferBMP[2 * (j * 2048 + k + i * 512) + 1] = bufferJP2[2 * (j * 512 + k) + 1];
-                                }
-                            }
-
-                        }
-
-                        FileStream fs = new FileStream(Variables.str_pathWork + "\\" + (import_id).ToString()+"_"+FrmCnt.ToString() + ".raw", FileMode.Create);
-                        fs.Write(bufferBMP, 0, 2048 * 160 * 2);
-                        fs.Close();
-
-                        Prog.Report((double)(progint++)/(double)dt.Rows.Count);
-
-                        }
-
-                        }
-                    fs_Import.Close();
-
-                    */
-
-
-                }
-                catch (Exception e)
-                {
-                    return e.Message;
-                }
-                
-               
-                return "解压完成！";
-            });
-        }
-
-
-        /*
-        public static Task<string> Import_2(IProgress<double> Prog, IProgress<string> List, CancellationToken cancel)
-        {
-            return Task.Run(()=> 
-            {
-                List<AuxDataRow> ListAuxDataRow;
-                List<FRAME> ListFrame;
-                List<int> ListFrmCnt;
-                try
-                {            
-                    FileStream fs = new FileStream(Variables.str_FilePath,FileMode.Open);
-                    byte[] buf_Row = new byte[288];
-                    ListAuxDataRow = new List<AuxDataRow>();
-                    ListFrmCnt = new List<int>();
-                    ListFrame = new List<FRAME>();
-                    while (fs.Position<fs.Length)
-                    {
-                        fs.Read(buf_Row, 0, 288);
-                        if (buf_Row[4] == 0x08 && buf_Row[5] == 0x01)
-                        {
-                            ThreadPool.QueueUserWorkItem(o=> 
-                            {
-                            ListAuxDataRow.Add(new AuxDataRow(buf_Row));
-                            },buf_Row);
-                        }
-                        else if(buf_Row[4]==0x0A)
-                        {
-                            RealDataRow rdl = new RealDataRow(buf_Row);
-
-                            if (ListFrmCnt.Contains(rdl.FrameCount))
-                            {
-                                ListFrame[ListFrame.IndexOf(ListFrame.Find(delegate (FRAME f) { return (f.FrmCnt == rdl.FrameCount); }))].InsertRow(rdl);
-                            }
-                            else
-                            {
-                                ListFrmCnt.Add(rdl.FrameCount);
-                                FRAME f = new FRAME(rdl.FrameCount);
-                                f.InsertRow(rdl);
-                                ListFrame.Add(f);
-                            }
-                        }
-                        if(fs.Position%(288*1000)==0)
-                        Prog.Report((double)fs.Position / (double)fs.Length);
-                    }
-
-                    fs.Close();
-                    ThreadPool.QueueUserWorkItem((o) =>
-                    {
-                        int i = 0;
-                        foreach (AuxDataRow r in ListAuxDataRow)
-                        {
-                            r.Insert();
-                            Prog.Report((double)i / (double)ListAuxDataRow.Count);
-                            i++;
-                        }
-                    });
-                }
-                catch (Exception Error)
-                {
-                    return Error.Message;
-                }
-
-                return "分包完成！";
-            });
-
-
-        }
-
-    
-
-
-        public static Task<string> Import_3(IProgress<double> Prog, IProgress<string> List, CancellationToken cancel)
-        {
-            return Task.Run(() =>
-            {
-                try
-                {
-                    FileStream fs = new FileStream(Variables.str_FilePath, FileMode.Open);
-                    byte[] buf_Row = new byte[288];
-                    while (fs.Position < fs.Length)
-                    {
-                        fs.Read(buf_Row, 0, 288);
-                        if (buf_Row[4] == 0x08 && buf_Row[5] == 0x01)
-                        {
-
-                        }
-                        else if (buf_Row[4] == 0x0A)
-                        {
-                            RealDataRow rdl = new RealDataRow(buf_Row);
-                            rdl.Insert();
-
-   
-                        }
-                        if (fs.Position % (288 * 1000) == 0)
-                            Prog.Report((double)fs.Position / (double)fs.Length);
-                    }
-
-                    fs.Close();
-                }
-                catch (Exception Error)
-                {
-                    return Error.Message;
-                }
-
-                return "分包完成！";
-            });
-
-
-        }
-
-
-    */
         public static Task<Bitmap> GetBmp(int v)
         {
             return Task.Run(()=> 
@@ -887,9 +697,9 @@ namespace Microsat.BackgroundTasks
             });
         }
 
+        #endregion
 
-        
-
+        #region Spectrum Curves
         public static Task<double[,]> GetChart()
         {
             return Task.Run(()=> {
@@ -900,7 +710,9 @@ namespace Microsat.BackgroundTasks
                 return result;
             });
         }
+        #endregion
 
+        #region database operations
         public static Task<DataTable> QueryResult(bool isChecked1, bool isChecked2, bool isChecked3, DateTime start_time, DateTime end_time, long start_FrmCnt, long end_FrmCnt, Coord coord_TL, Coord coord_DR)
         {
 
@@ -940,19 +752,8 @@ namespace Microsat.BackgroundTasks
 
 
             });
-            }
-
-        public static Task<DataTable> QueryResult()
-        {
-            return Task.Run(() => {
-
-                SQLiteDatabase db = new SQLiteDatabase(Variables.dbConString);
-
-                return db.GetDataTable("select * from AuxData");
-
-            });
         }
-
+        #endregion
 
         #region 处理
         public static UInt32 readU32(byte[] buf_row, int addr)
@@ -1003,7 +804,118 @@ namespace Microsat.BackgroundTasks
         #endregion
     }
 
+    #region FRAME class
 
+    public class ROW
+    {
+        public UInt16 FrameCount;
+        public UInt16 PackCount;
+        public byte Chanel;
+        public long ImportId = 0;
+        public byte[] buf_Row;
+        public ROW(byte[] ROW, long id)
+        {
+            FrameCount = DataProc.readU16(ROW, 6);
+            PackCount = DataProc.readU16(ROW, 8);
+            Chanel = DataProc.readU8(ROW, 5);
+            buf_Row = ROW;
+            ImportId = id;
+
+        }
+    }
+
+    public class RealDataRow : ROW
+    {
+        public bool isHead = false;
+        public bool isTail = false;
+        public RealDataRow(byte[] ROW, long id) : base(ROW, id)
+        {
+
+            if ((UInt32)(ROW[32] << 24 | ROW[33] << 16 | ROW[34] << 8 | ROW[35]) == 0xFF4FFF51)
+            {
+                isHead = true;
+            }
+
+
+        }
+        public void Insert()
+        {
+
+            FileStream fs = new FileStream(Variables.str_pathWork + "\\" + ImportId.ToString() + "_" + FrameCount.ToString() + "_" + Chanel.ToString() + ".jp2", FileMode.Append, FileAccess.Write, FileShare.Write);
+            if (isHead) fs.Write(buf_Row, 32, 240);
+            else fs.Write(buf_Row, 16, 256);
+            fs.Close();
+
+        }
+    }
+
+    public class AuxDataRow : ROW
+    {
+        protected double GST;
+        protected double Lat;
+        protected double Lon;
+        protected double X;
+        protected double Y;
+        protected double Z;
+        protected double Vx;
+        protected double Vy;
+        protected double Vz;
+        protected double Ox;
+        protected double Oy;
+        protected double Oz;
+        public AuxDataRow(byte[] ROW, long id) : base(ROW, id)
+        {
+
+            X = 7000 * Math.Cos(Math.PI * ((double)(FrameCount % 360) / 180));//readLength(32);
+            Y = 7000 * Math.Sin(Math.PI * ((double)(FrameCount % 360) / 180));//readLength(36);
+            Z = 0;//readLength(40);
+            Vx = 7.546 * Math.Cos(Math.PI * ((double)(FrameCount % 360) / 180) + Math.PI / 2);//readLength(44);
+            Vy = 7.546 * Math.Sin(Math.PI * ((double)(FrameCount % 360) / 180) + Math.PI / 2);//readLength();
+            Vz = 0;//0;//
+            GST = DateTime.Now.Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds;//OrbitCalc.CalGST(new POSE_TIME(DateTime.Now));
+            double[] latlon = new double[2];
+            latlon = OrbitCalc.CalEarthLonLat(new double[3] { X, Y, Z }, GST);
+            Lat = latlon[1] * 180 / Math.PI;
+            Lon = latlon[0] * 180 / Math.PI;
+            Ox = 0;
+            Oy = 0;
+            Oz = 0;
+        }
+
+        internal void Insert()
+        {
+            SQLiteDatabase sqlExcute = new SQLiteDatabase(Variables.dbPath);
+            try
+            {
+                var sql = "insert into AuxData values(@FrameId,@SatelliteId,@GST,@Lat,@Lon,@X,@Y,@Z,@Vx,@Vy,@Vz,@Ox,@Oy,@Oz,@ImportId,@Chanel);";
+                var cmdparams = new List<SQLiteParameter>()
+                {
+                    new SQLiteParameter("FrameId", FrameCount),
+                    new SQLiteParameter("SatelliteId","MicroSat"),
+                    new SQLiteParameter("GST",GST),
+                    new SQLiteParameter("Lat",Lat),
+                    new SQLiteParameter("Lon",Lon),
+                    new SQLiteParameter("X",X),
+                    new SQLiteParameter("Y",Y),
+                    new SQLiteParameter("Z",Z),
+                    new SQLiteParameter("Vx",Vx),
+                    new SQLiteParameter("Vy",Vy),
+                    new SQLiteParameter("Vz",Vz),
+                    new SQLiteParameter("Ox",Ox),
+                    new SQLiteParameter("Oy",Oy),
+                    new SQLiteParameter("Oz",Oz),
+                    new SQLiteParameter("ImportId",ImportId),
+                    new SQLiteParameter("Chanel",Chanel)
+                };
+                sqlExcute.ExecuteNonQuery(sql, cmdparams);
+            }
+            catch (Exception e)
+            {
+                //Do any logging operation here if necessary
+                throw e;
+            }
+        }
+    }
     public class FRAME
     {
         public List<RealDataRow>[] ItemList;
@@ -1077,16 +989,19 @@ namespace Microsat.BackgroundTasks
 
         }
 
+    #endregion
 
-
+    #region Spectrum Operations
     public class SpecProc
     {
 
-        public static Task<System.Windows.Point[]> GetSpecCurv(int importId, int frmCnt_Start, int frmCnt_End, int specSelected, System.Windows.Point p)
+        public static Task<System.Windows.Point[]> GetSpecCurv(System.Windows.Point p)
         {
             return Task.Run(()=>
             {
-
+                long importId = (long)DataQuery.QueryResult.Rows[0].ItemArray[14];
+                long frmCnt_Start = (long)DataQuery.QueryResult.Rows[0].ItemArray[0];
+                long frmCnt_End = (long)DataQuery.QueryResult.Rows[DataQuery.QueryResult.Rows.Count-1].ItemArray[0];
                 System.Windows.Point[] result = new System.Windows.Point[149];
                 FileStream fs = new FileStream($"{Variables.str_pathWork}\\{importId}_{(int)(frmCnt_Start + p.Y * (frmCnt_End - frmCnt_Start))}_{(int)(p.X*2048)/512+1}.raw", FileMode.Open, FileAccess.Read, FileShare.Read);
                 byte[] buf = new byte[512 * 160 * 2];
@@ -1108,246 +1023,9 @@ namespace Microsat.BackgroundTasks
         }
     }
 
+    #endregion
 
-
-
-
-
-    public class ROW
-    {
-        public UInt16 FrameCount;
-        public UInt16 PackCount;
-        public byte Chanel;
-        public long ImportId=0;
-        public byte[] buf_Row;
-        public ROW(byte[] ROW,long id)
-        {
-            FrameCount = DataProc.readU16(ROW, 6);
-            PackCount = DataProc.readU16(ROW, 8);
-            Chanel = DataProc.readU8(ROW, 5);
-            buf_Row = ROW;
-            ImportId = id;
-
-        }
-    }
-
-    public class RealDataRow : ROW
-    {
-        public bool isHead = false;
-        public bool isTail = false;
-        public RealDataRow(byte[] ROW,long id) : base(ROW,id)
-        {
-
-            if ((UInt32)(ROW[32] << 24 | ROW[33] << 16 | ROW[34] << 8 | ROW[35]) == 0xFF4FFF51)
-            {
-                isHead = true;
-            }
-        
-
-        }
-        public void Insert()
-        {
-
-            FileStream fs = new FileStream(Variables.str_pathWork + "\\" + ImportId.ToString() + "_" + FrameCount.ToString() + "_" + Chanel.ToString() + ".jp2", FileMode.Append,FileAccess.Write,FileShare.Write);
-            if(isHead)fs.Write(buf_Row, 32, 240);
-            else fs.Write(buf_Row, 16, 256);
-            fs.Close();
-
-        }
-    }
-
-    public class AuxDataRow : ROW
-    {
-        protected double GST;
-        protected double Lat;
-        protected double Lon;
-        protected double X;
-        protected double Y;
-        protected double Z;
-        protected double Vx;
-        protected double Vy;
-        protected double Vz;
-        protected double Ox;
-        protected double Oy;
-        protected double Oz;
-        public AuxDataRow(byte[] ROW,long id) : base(ROW,id)
-        {
-
-            X = 7000 * Math.Cos(Math.PI * ((double)(FrameCount % 360) / 180));//readLength(32);
-            Y = 7000 * Math.Sin(Math.PI * ((double)(FrameCount % 360) / 180));//readLength(36);
-            Z = 0;//readLength(40);
-            Vx = 7.546 * Math.Cos(Math.PI * ((double)(FrameCount % 360) / 180) + Math.PI / 2);//readLength(44);
-            Vy = 7.546 * Math.Sin(Math.PI * ((double)(FrameCount % 360) / 180) + Math.PI / 2);//readLength();
-            Vz = 0;//0;//
-            GST = DateTime.Now.Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds;//OrbitCalc.CalGST(new POSE_TIME(DateTime.Now));
-            double[] latlon = new double[2];
-            latlon = OrbitCalc.CalEarthLonLat(new double[3] { X, Y, Z }, GST);
-            Lat = latlon[1] * 180 / Math.PI;
-            Lon = latlon[0] * 180 / Math.PI;
-            Ox = 0;
-            Oy = 0;
-            Oz = 0;
-        }
-
-        internal void Insert()
-        {
-            SQLiteDatabase sqlExcute = new SQLiteDatabase(Variables.dbPath);
-            try
-            {
-                var sql = "insert into AuxData values(@FrameId,@SatelliteId,@GST,@Lat,@Lon,@X,@Y,@Z,@Vx,@Vy,@Vz,@Ox,@Oy,@Oz,@ImportId,@Chanel);";
-                var cmdparams = new List<SQLiteParameter>()
-                {
-                    new SQLiteParameter("FrameId", FrameCount),
-                    new SQLiteParameter("SatelliteId","MicroSat"),
-                    new SQLiteParameter("GST",GST),
-                    new SQLiteParameter("Lat",Lat),
-                    new SQLiteParameter("Lon",Lon),
-                    new SQLiteParameter("X",X),
-                    new SQLiteParameter("Y",Y),
-                    new SQLiteParameter("Z",Z),
-                    new SQLiteParameter("Vx",Vx),
-                    new SQLiteParameter("Vy",Vy),
-                    new SQLiteParameter("Vz",Vz),
-                    new SQLiteParameter("Ox",Ox),
-                    new SQLiteParameter("Oy",Oy),
-                    new SQLiteParameter("Oz",Oz),
-                    new SQLiteParameter("ImportId",ImportId),
-                    new SQLiteParameter("Chanel",Chanel)
-                };
-                sqlExcute.ExecuteNonQuery(sql, cmdparams);
-            }
-            catch (Exception e)
-            {
-                //Do any logging operation here if necessary
-                throw e;
-            }
-        }
-    }
-
-
-
-    public class AuxData
-    {
-        public UInt16 FrmCnt;
-        protected double GST;
-        protected double Lat;
-        protected double Lon;
-        protected double X;
-        protected double Y;
-        protected double Z;
-        protected double Vx;
-        protected double Vy;
-        protected double Vz;
-        protected double Ox;
-        protected double Oy;
-        protected double Oz;
-        public byte[] buf_row;
-
-        public AuxData(ref byte[] buf_row)
-        {
-            this.buf_row = buf_row;
-            FrmCnt = readU16(buf_row,6);
-            X = 7000 * Math.Cos(Math.PI*((double)(FrmCnt%360)/180));//readLength(32);
-            Y = 7000 * Math.Sin(Math.PI * ((double)(FrmCnt % 360) / 180));//readLength(36);
-            Z =  0;//readLength(40);
-            Vx = 7.546 * Math.Cos(Math.PI * ((double)(FrmCnt % 360) / 180) + Math.PI / 2);//readLength(44);
-            Vy = 7.546 * Math.Sin(Math.PI * ((double)(FrmCnt % 360) / 180) + Math.PI / 2);//readLength();
-            Vz = 0;//0;//
-            GST = DateTime.Now.Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds;//OrbitCalc.CalGST(new POSE_TIME(DateTime.Now));
-            double[] latlon = new double[2];
-            latlon = OrbitCalc.CalEarthLonLat(new double[3] { X, Y, Z }, GST);
-            Lat =  latlon[1] * 180 / Math.PI;
-            Lon = latlon[0] * 180 / Math.PI;
-            Ox = 0;
-            Oy = 0;
-            Oz = 0;
-        }
-
-        public override string ToString()
-        {
-            string s = null;
-
-            s +="帧编号："+ FrmCnt.ToString()+"\n";
-            s += "经度：" + Lon.ToString() + "\n";
-            s += "纬度:" + Lat.ToString() + "\n"
-;            return s;
-
-        }
-
-        public bool Insert(int ImportId)
-        {
-            SQLiteDatabase sqlExcute = new SQLiteDatabase(Variables.dbPath);
-            try
-            {
-
-                var sql = "insert into AuxData values(@FrameId,@SatelliteId,@GST,@Lat,@Lon,@X,@Y,@Z,@Vx,@Vy,@Vz,@Ox,@Oy,@Oz,@ImportId);";
-                var cmdparams = new List<SQLiteParameter>()
-                {
-                    new SQLiteParameter("FrameId", FrmCnt),
-                    new SQLiteParameter("SatelliteId","MicroSat"),
-                    new SQLiteParameter("GST",GST),
-                    new SQLiteParameter("Lat",Lat),
-                    new SQLiteParameter("Lon",Lon),
-                    new SQLiteParameter("X",X),
-                    new SQLiteParameter("Y",Y),
-                    new SQLiteParameter("Z",Z),
-                    new SQLiteParameter("Vx",Vx),
-                    new SQLiteParameter("Vy",Vy),
-                    new SQLiteParameter("Vz",Vz),
-                    new SQLiteParameter("Ox",Ox),
-                    new SQLiteParameter("Oy",Oy),
-                    new SQLiteParameter("Oz",Oz),
-                    new SQLiteParameter("ImportId",ImportId)
-                };
-                return sqlExcute.ExecuteNonQuery(sql, cmdparams);
-            }
-            catch (Exception e)
-            {
-                //Do any logging operation here if necessary
-                return false;
-                throw e;
-                
-            }
-        }
-        #region 数据解析函数
-        public static UInt32 readU32(byte[]buf_row, int addr)
-        {
-            byte[] conv = new byte[4] { buf_row[addr + 3], buf_row[addr + 2], buf_row[addr + 1], buf_row[addr] };
-            return BitConverter.ToUInt32(conv, 0);
-        }
-        public static Int32 readI32(byte[] buf_row, int addr)
-        {
-            byte[] conv = new byte[4] { buf_row[addr + 3], buf_row[addr + 2], buf_row[addr + 1], buf_row[addr] };
-            return BitConverter.ToInt32(conv, 0);
-        }
-        public static UInt16 readU16(byte[] buf_row, int addr)
-        {
-            byte[] conv = new byte[2] { buf_row[addr + 1], buf_row[addr] };
-            return BitConverter.ToUInt16(conv, 0);
-        }
-        public static byte readU8(byte[] buf_row, int addr)
-        {
-            return buf_row[addr];
-        }
-        public static float readF32(byte[] buf_row, int addr)
-        {
-            byte[] conv = new byte[4] { buf_row[addr + 3], buf_row[addr + 2], buf_row[addr + 1], buf_row[addr] };
-            int a = BitConverter.ToInt32(conv, 0);
-            float result = (float)a / 1000;
-            return result;
-        }
-        public static float readLength(byte[] buf_row, int addr)
-        {
-            float result = (float)readI32(buf_row,addr) / 1000;
-            return result;
-        }
-        public static float readDegree(byte[] buf_row, int addr)
-        {
-            float result = (float)((float)readI32(buf_row,addr) / 1000 * 180/Math.PI);
-            return result;
-        }
-        #endregion
-    }
+    #region Orbit Calculation Class
     public class OrbitCalc
     {
 
@@ -1413,27 +1091,31 @@ namespace Microsat.BackgroundTasks
                 LfDelt = 1.0F * (cTime.S - cTime1.S) + temp;
             return LfDelt;
         }
+
+        public class POSE_TIME
+        {
+            public int S;
+            public int M;
+            private DateTime now;
+            public POSE_TIME()
+            {
+                S = 0;
+                M = 0;
+            }
+            public POSE_TIME(int a, int b)
+            {
+                S = a;
+                M = b;
+            }
+            public POSE_TIME(DateTime now)
+            {
+                this.now = now;
+                S = (int)(now.Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds);
+                M = (int)((now.Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds - (int)(now.Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds)) * 1000000);
+            }
+        }
     }
-    public class POSE_TIME
-    {
-        public int S;
-        public int M;
-        private DateTime now;
-        public POSE_TIME()
-        {
-            S = 0;
-            M = 0;
-        }
-        public POSE_TIME(int a, int b)
-        {
-            S = a;
-            M = b;
-        }
-        public POSE_TIME(DateTime now)
-        {
-            this.now = now;
-            S = (int)(now.Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds);
-            M =(int) ((now.Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds - (int)(now.Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds)) * 1000000);
-        }
-    }
+
+    #endregion
+
 }

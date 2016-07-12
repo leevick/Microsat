@@ -4,32 +4,22 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Microsat"
+             xmlns:d3="http://research.microsoft.com/DynamicDataDisplay/1.0"
              xmlns:Custom="WFTools3D" x:Class="Microsat.Ctrl_SpecCurv"
              mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="300">
-    <Grid>
-        <Custom:Scene3D BorderBrush="Black" Name="scene" BorderThickness="1" Background="#FFD8D8D8"/>
-        <Grid x:Name="info" Background="LightGray" Opacity="0.5" HorizontalAlignment="Right" VerticalAlignment="Top">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-            <Grid.Triggers>
-                <EventTrigger RoutedEvent="MouseEnter">
-                    <BeginStoryboard>
-                        <Storyboard>
-                            <DoubleAnimation Duration="0:0:1" To="1" Storyboard.TargetProperty="Opacity"/>
-                        </Storyboard>
-                    </BeginStoryboard>
-                </EventTrigger>
-                <EventTrigger RoutedEvent="MouseLeave">
-                    <BeginStoryboard>
-                        <Storyboard>
-                            <DoubleAnimation Duration="0:0:5" To="0.1" Storyboard.TargetProperty="Opacity"/>
-                        </Storyboard>
-                    </BeginStoryboard>
-                </EventTrigger>
-            </Grid.Triggers>
-        </Grid>
+             d:DesignHeight="768" d:DesignWidth="1024">
+    <Grid Margin="0">
+        <d3:ChartPlotter x:Name="chart1st" Margin="0" Opacity="0.8" Background="Black" Foreground="#FF998F8F" BorderBrush="White" FontSize="18">
+            <d3:ChartPlotter.HorizontalAxis>
+                <d3:HorizontalAxis x:Name="Xchart1st"/>
+            </d3:ChartPlotter.HorizontalAxis>
+            <d3:ChartPlotter.VerticalAxis>
+                <d3:VerticalAxis x:Name="Ychart1st"/>
+            </d3:ChartPlotter.VerticalAxis>
+            <d3:Header FontFamily="Arial" Content="光谱曲线" FontSize="24" Margin="0,5"/>
+            <d3:HorizontalAxisTitle Content="谱段" FontSize="24"/>
+            <d3:VerticalAxisTitle Content="值" FontSize="24"/>
+        </d3:ChartPlotter>
+        <TextBox Margin="100,100,0,0" TextWrapping="Wrap" Text="平均值：128" IsEnabled="False" VerticalAlignment="Top" d:LayoutOverrides="VerticalAlignment" FontSize="18" HorizontalAlignment="Left"/>
     </Grid>
 </UserControl>
