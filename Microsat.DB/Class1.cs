@@ -4,40 +4,40 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Data;
-using System.Data.OleDb;
+using System.Data.SQLite;
 
 namespace Microsat.DB
 {
-    public class OledbDatabase
+    public class SQLiteDatabase
     {
         String dbConnection;
-        OleDbConnection cnn;
+        SQLiteConnection cnn;
 
         #region ctor
         /// <summary>
         ///     Default Constructor for SQLiteDatabase Class.
         /// </summary>
-        public OledbDatabase()
+        public SQLiteDatabase()
         {
             dbConnection = "Data Source=recipes.s3db";
-            cnn = new OleDbConnection(dbConnection);
+            cnn = new SQLiteConnection(dbConnection);
         }
 
         /// <summary>
         ///     Single Param Constructor for specifying the DB file.
         /// </summary>
         /// <param name="inputFile">The File containing the DB</param>
-        public OledbDatabase(String inputFile)
+        public SQLiteDatabase(String inputFile)
         {
-            dbConnection = String.Format("Provider=Microsoft.Jet.OLEDB.4.0;Data Source={0}", inputFile);
-            cnn = new OleDbConnection(dbConnection);
+            dbConnection = String.Format("Data Source={0}", inputFile);
+            cnn = new SQLiteConnection(dbConnection);
         }
 
         /// <summary>
         ///     Single Param Constructor for specifying advanced connection options.
         /// </summary>
         /// <param name="connectionOpts">A dictionary containing all desired options and their values</param>
-        public OledbDatabase(Dictionary<String, String> connectionOpts)
+        public SQLiteDatabase(Dictionary<String, String> connectionOpts)
         {
             String str = "";
             foreach (KeyValuePair<String, String> row in connectionOpts)
@@ -46,7 +46,7 @@ namespace Microsat.DB
             }
             str = str.Trim().Substring(0, str.Length - 1);
             dbConnection = str;
-            cnn = new OleDbConnection(dbConnection);
+            cnn = new SQLiteConnection(dbConnection);
         }
         #endregion
 
@@ -60,11 +60,11 @@ namespace Microsat.DB
             DataTable dt = new DataTable();
             try
             {
-                OleDbConnection cnn = new OleDbConnection(dbConnection);
+                SQLiteConnection cnn = new SQLiteConnection(dbConnection);
                 cnn.Open();
-                OleDbCommand mycommand = new OleDbCommand("",cnn);
+                SQLiteCommand mycommand = new SQLiteCommand("",cnn);
                 mycommand.CommandText = sql;
-                OleDbDataReader reader = mycommand.ExecuteReader();
+                SQLiteDataReader reader = mycommand.ExecuteReader();
                 dt.Load(reader);
                 reader.Close();
                 cnn.Close();
@@ -75,18 +75,18 @@ namespace Microsat.DB
             }
             return dt;
         }
-        public DataTable GetDataTable(string sql, IList<OleDbParameter> cmdparams)
+        public DataTable GetDataTable(string sql, IList<SQLiteParameter> cmdparams)
         {
             DataTable dt = new DataTable();
             try
             {
-                OleDbConnection cnn = new OleDbConnection(dbConnection);
+                SQLiteConnection cnn = new SQLiteConnection(dbConnection);
                 cnn.Open();
-                OleDbCommand mycommand = new OleDbCommand("",cnn);
+                SQLiteCommand mycommand = new SQLiteCommand("",cnn);
                 mycommand.CommandText = sql;
                 mycommand.Parameters.AddRange(cmdparams.ToArray());
                 mycommand.CommandTimeout = 180;
-                OleDbDataReader reader = mycommand.ExecuteReader();
+                SQLiteDataReader reader = mycommand.ExecuteReader();
                 dt.Load(reader);
                 reader.Close();
                 cnn.Close();
@@ -107,9 +107,9 @@ namespace Microsat.DB
         {
             bool successState = false;
             cnn.Open();
-            using (OleDbTransaction mytrans = cnn.BeginTransaction())
+            using (SQLiteTransaction mytrans = cnn.BeginTransaction())
             {
-                OleDbCommand mycommand = new OleDbCommand(sql, cnn);
+                SQLiteCommand mycommand = new SQLiteCommand(sql, cnn);
                 try
                 {
                     mycommand.CommandTimeout = 180;
@@ -131,13 +131,13 @@ namespace Microsat.DB
             return successState;
         }
 
-        public bool ExecuteNonQuery(string sql, IList<OleDbParameter> cmdparams)
+        public bool ExecuteNonQuery(string sql, IList<SQLiteParameter> cmdparams)
         {
             bool successState = false;
             cnn.Open();
-            using (OleDbTransaction mytrans = cnn.BeginTransaction())
+            using (SQLiteTransaction mytrans = cnn.BeginTransaction())
             {
-                OleDbCommand mycommand = new OleDbCommand(sql, cnn, mytrans);
+                SQLiteCommand mycommand = new SQLiteCommand(sql, cnn, mytrans);
                 try
                 {
                     mycommand.Parameters.AddRange(cmdparams.ToArray());
@@ -171,7 +171,7 @@ namespace Microsat.DB
         public object ExecuteScalar(string sql)
         {
             cnn.Open();
-            OleDbCommand mycommand = new OleDbCommand("",cnn);
+            SQLiteCommand mycommand = new SQLiteCommand("",cnn);
             mycommand.CommandText = sql;
             object value = mycommand.ExecuteScalar();
             return value;

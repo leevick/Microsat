@@ -75,10 +75,6 @@
     <Reference Include="DynamicDataDisplay">
       <HintPath>.\DynamicDataDisplay.dll</HintPath>
     </Reference>
-    <Reference Include="FreeImageNET, Version=3.15.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\FreeImage\FreeImageNET.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.configuration" />
     <Reference Include="System.Data" />

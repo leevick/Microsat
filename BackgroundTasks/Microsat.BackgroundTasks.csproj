@@ -59,13 +59,14 @@
     <Reference Include="DynamicDataDisplay">
       <HintPath>..\Microsat\DynamicDataDisplay.dll</HintPath>
     </Reference>
-    <Reference Include="FreeImageNET">
-      <HintPath>..\FreeImage\FreeImageNET.dll</HintPath>
-    </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Data.SQLite, Version=1.0.101.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\..\Program Files\System.Data.SQLite\2012\bin\System.Data.SQLite.dll</HintPath>
+    </Reference>
     <Reference Include="System.Drawing" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -80,6 +81,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\FreeImage.NET\Library\FreeImageDotNet.csproj">
+      <Project>{6598a7cd-8f27-4d3f-a675-5ae63113a7c3}</Project>
+      <Name>FreeImageDotNet</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Microsat.DB\Microsat.DB.csproj">
       <Project>{a2a06b38-e935-4b8e-a208-30d07ad28c8f}</Project>
       <Name>Microsat.DB</Name>

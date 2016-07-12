@@ -8,7 +8,7 @@ using System.Windows.Controls;
 using Microsat.Shared;
 using System.IO;
 using Microsat.DB;
-using System.Data.OleDb;
+using System.Data.SQLite;
 using System.Data;
 //using FreeImageAPI;
 using System.Runtime.InteropServices;
@@ -30,12 +30,13 @@ namespace Microsat.BackgroundTasks
             {
                 try
                 {
-                    OleDbConnection conn = new OleDbConnection(Variables.dbConString);
+                    SQLiteConnection conn = new SQLiteConnection(Variables.dbConString);
                     conn.Open();
-                    OleDbCommand cmd = new OleDbCommand("INSERT INTO Import_History (FileName)VALUES(\"" + Variables.str_FilePath + "\")", conn);
+                    SQLiteCommand cmd = new SQLiteCommand("INSERT INTO Import_History (FileName)VALUES(\"" + Variables.str_FilePath + "\")", conn);
                     cmd.ExecuteNonQuery();
                     cmd.CommandText = "SELECT ID from Import_History ORDER BY id DESC";
-                    int import_id = (int)(cmd.ExecuteScalar());
+                    long import_id = (long)(cmd.ExecuteScalar());
+
                     Thread t1 = new Thread(new ThreadStart(()=> 
                                 {
                                     double d_progress = 0;
@@ -472,7 +473,7 @@ namespace Microsat.BackgroundTasks
                     progress_Prog.Report((double)i/DataQuery.QueryResult.Rows.Count);
                     byte[] buf_rgb = new byte[2048 * 3];
                     Parallel.For(1, 5, k => {
-                        FileStream fs = new FileStream($"{Variables.str_pathWork}\\{(int)(DataQuery.QueryResult.Rows[i].ItemArray[14])}_{(int)(DataQuery.QueryResult.Rows[i].ItemArray[0])}_{k}.raw", FileMode.Open, FileAccess.Read, FileShare.Read);
+                        FileStream fs = new FileStream($"{Variables.str_pathWork}\\{(long)(DataQuery.QueryResult.Rows[i].ItemArray[14])}_{(long)(DataQuery.QueryResult.Rows[i].ItemArray[0])}_{k}.raw", FileMode.Open, FileAccess.Read, FileShare.Read);
                         fs.Seek(v * 512 * 2, SeekOrigin.Begin);
                         byte[] temp = new byte[512 * 2];
                         fs.Read(temp, 0, 1024);
@@ -502,10 +503,10 @@ namespace Microsat.BackgroundTasks
                     double file_length = fs_Import.Length;
                     byte[] buf_row = new byte[288];
                     AuxData Aux = new AuxData(ref buf_row);
-                    OleDbConnection conn = new OleDbConnection(Variables.dbConString);
+                    SQLiteConnection conn = new SQLiteConnection(Variables.dbConString);
                     conn.Open();
-                    OleDbCommand cmd = new OleDbCommand("INSERT INTO Import_History (FileName)VALUES(\"" + Variables.str_FilePath + "\")", conn);
-                    OledbDatabase db = new OledbDatabase(Variables.dbPath);
+                    SQLiteCommand cmd = new SQLiteCommand("INSERT INTO Import_History (FileName)VALUES(\"" + Variables.str_FilePath + "\")", conn);
+                    SQLiteDatabase db = new SQLiteDatabase(Variables.dbPath);
                     cmd.ExecuteNonQuery();
                     cmd.CommandText = "SELECT ID from Import_History ORDER BY id DESC";
                     int import_id = (int)(cmd.ExecuteScalar());
@@ -559,7 +560,7 @@ namespace Microsat.BackgroundTasks
                         cmd.CommandText = "SELECT COUNT(*) FROM (SELECT distinct Chanel FROM Temp WHERE FrmCnt=" + ((int)(dr.ItemArray[0])).ToString() + " AND ImportId="+import_id.ToString()+")";
                         if ((int)cmd.ExecuteScalar() == 4)
                         {
-                            OledbDatabase db2 = new OledbDatabase(Variables.dbPath);
+                            SQLiteDatabase db2 = new SQLiteDatabase(Variables.dbPath);
                             MemoryStream[] ms = new MemoryStream[4];
 
                             byte[] bufferBMP = new byte[2048 * 160 * 2];
@@ -567,8 +568,8 @@ namespace Microsat.BackgroundTasks
                             for (int i = 0; i < 4; i++)
                             {
                                
-                                OleDbCommand cmd2 = new OleDbCommand("SELECT [Position] FROM [Temp] WHERE [FrmCnt]=" + ((int)(dr.ItemArray[0])).ToString() + " and [ImportId] =" + import_id.ToString() + " and [Chanel]=" + (i + 1).ToString() + " ORDER BY [PackCnt] ASC", conn);
-                                OleDbDataReader reader2 = cmd2.ExecuteReader();
+                                SQLiteCommand cmd2 = new SQLiteCommand("SELECT [Position] FROM [Temp] WHERE [FrmCnt]=" + ((int)(dr.ItemArray[0])).ToString() + " and [ImportId] =" + import_id.ToString() + " and [Chanel]=" + (i + 1).ToString() + " ORDER BY [PackCnt] ASC", conn);
+                                SQLiteDataReader reader2 = cmd2.ExecuteReader();
                                 DataTable dt2 = new DataTable();
                                 dt2.Load(reader2);
 
@@ -752,7 +753,7 @@ namespace Microsat.BackgroundTasks
                 Parallel.For(0, DataQuery.QueryResult.Rows.Count, (i) => {
                     byte[] buf_rgb = new byte[2048 * 3];
                     Parallel.For(1, 5, k => {
-                        FileStream fs = new FileStream($"{Variables.str_pathWork}\\{(int)(DataQuery.QueryResult.Rows[i].ItemArray[14])}_{(int)(DataQuery.QueryResult.Rows[i].ItemArray[0])}_{k}.raw", FileMode.Open, FileAccess.Read, FileShare.Read);
+                        FileStream fs = new FileStream($"{Variables.str_pathWork}\\{(long)(DataQuery.QueryResult.Rows[i].ItemArray[14])}_{(long)(DataQuery.QueryResult.Rows[i].ItemArray[0])}_{k}.raw", FileMode.Open, FileAccess.Read, FileShare.Read);
                         fs.Seek(v * 512 * 2, SeekOrigin.Begin);
                         byte[] temp = new byte[512 * 2];
                         fs.Read(temp, 0, 1024);
@@ -788,7 +789,7 @@ namespace Microsat.BackgroundTasks
                     Parallel.For(0, 4, k =>
                     {
                         byte[] buf_file = new byte[512 * 160 * 2];
-                        FileStream fs = new FileStream($"{Variables.str_pathWork}\\{(int)(DataQuery.QueryResult.Rows[0].ItemArray[14])}_{(int)(DataQuery.QueryResult.Rows[0].ItemArray[0])}_{k+1}.raw", FileMode.Open, FileAccess.Read, FileShare.Read);
+                        FileStream fs = new FileStream($"{Variables.str_pathWork}\\{(long)(DataQuery.QueryResult.Rows[0].ItemArray[14])}_{(long)(DataQuery.QueryResult.Rows[0].ItemArray[0])}_{k+1}.raw", FileMode.Open, FileAccess.Read, FileShare.Read);
                         fs.Read(buf_file, 0, 512 * 160 * 2);
                         Parallel.For(0, 160, i => {
                             Parallel.For(0, 512, j =>
@@ -811,7 +812,7 @@ namespace Microsat.BackgroundTasks
                     Parallel.For(0, 4, k =>
                     {
                         byte[] buf_file = new byte[512 * 160 * 2];
-                        FileStream fs = new FileStream($"{Variables.str_pathWork}\\{(int)(DataQuery.QueryResult.Rows[DataQuery.QueryResult.Rows.Count-1].ItemArray[14])}_{(int)(DataQuery.QueryResult.Rows[DataQuery.QueryResult.Rows.Count - 1].ItemArray[0])}_{k + 1}.raw", FileMode.Open, FileAccess.Read, FileShare.Read);
+                        FileStream fs = new FileStream($"{Variables.str_pathWork}\\{(long)(DataQuery.QueryResult.Rows[DataQuery.QueryResult.Rows.Count-1].ItemArray[14])}_{(long)(DataQuery.QueryResult.Rows[DataQuery.QueryResult.Rows.Count - 1].ItemArray[0])}_{k + 1}.raw", FileMode.Open, FileAccess.Read, FileShare.Read);
                         fs.Read(buf_file, 0, 512 * 160 * 2);
                         Parallel.For(0, 160, i => {
                             Parallel.For(0, 512, j =>
@@ -833,7 +834,7 @@ namespace Microsat.BackgroundTasks
                     BitmapData bmpData = bmpTop.LockBits(new System.Drawing.Rectangle(0, 0, DataQuery.QueryResult.Rows.Count, 160), System.Drawing.Imaging.ImageLockMode.WriteOnly, bmpTop.PixelFormat);
                     byte[] buf_full = new byte[160 * DataQuery.QueryResult.Rows.Count * 4];
                     Parallel.For(0, DataQuery.QueryResult.Rows.Count, (i) => {
-                        FileStream fs = new FileStream($"{Variables.str_pathWork}\\{(int)(DataQuery.QueryResult.Rows[i].ItemArray[14])}_{(int)(DataQuery.QueryResult.Rows[DataQuery.QueryResult.Rows.Count-1-i].ItemArray[0])}_4.raw", FileMode.Open, FileAccess.Read, FileShare.Read);
+                        FileStream fs = new FileStream($"{Variables.str_pathWork}\\{(long)(DataQuery.QueryResult.Rows[i].ItemArray[14])}_{(long)(DataQuery.QueryResult.Rows[DataQuery.QueryResult.Rows.Count-1-i].ItemArray[0])}_4.raw", FileMode.Open, FileAccess.Read, FileShare.Read);
                         byte[] buf_temp = new byte[512 * 160 * 2];
                         fs.Read(buf_temp, 0, 512 * 160 * 2);
                         Parallel.For(0, 160, j => {
@@ -854,7 +855,7 @@ namespace Microsat.BackgroundTasks
                     BitmapData bmpData = bmpTop.LockBits(new System.Drawing.Rectangle(0, 0, DataQuery.QueryResult.Rows.Count, 160), System.Drawing.Imaging.ImageLockMode.WriteOnly, bmpTop.PixelFormat);
                     byte[] buf_full = new byte[160 * DataQuery.QueryResult.Rows.Count * 4];
                     Parallel.For(0, DataQuery.QueryResult.Rows.Count, (i) => {
-                        FileStream fs = new FileStream($"{Variables.str_pathWork}\\{(int)(DataQuery.QueryResult.Rows[i].ItemArray[14])}_{(int)(DataQuery.QueryResult.Rows[i].ItemArray[0])}_1.raw", FileMode.Open, FileAccess.Read, FileShare.Read);
+                        FileStream fs = new FileStream($"{Variables.str_pathWork}\\{(long)(DataQuery.QueryResult.Rows[i].ItemArray[14])}_{(long)(DataQuery.QueryResult.Rows[i].ItemArray[0])}_1.raw", FileMode.Open, FileAccess.Read, FileShare.Read);
                         byte[] buf_temp = new byte[512 * 160 * 2];
                         fs.Read(buf_temp, 0, 512 * 160 * 2);
                         Parallel.For(0, 160, j => {
@@ -905,11 +906,11 @@ namespace Microsat.BackgroundTasks
 
             return Task.Run(() =>
             {
-                OleDbConnection conn = new OleDbConnection(Variables.dbConString);
+                SQLiteConnection conn = new SQLiteConnection(Variables.dbConString);
                 conn.Open();
-                OleDbCommand cmmd = new OleDbCommand("", conn);
+                SQLiteCommand cmmd = new SQLiteCommand("", conn);
                 cmmd.CommandText = "SELECT ID from Import_History ORDER BY id DESC";
-                int import_id = (int)(cmmd.ExecuteScalar());
+                long import_id = (long)(cmmd.ExecuteScalar());
 
                 string command = $"SELECT * FROM AuxData WHERE Chanel=1 AND ImportId={import_id}";
                 if ((bool)isChecked2)
@@ -934,7 +935,7 @@ namespace Microsat.BackgroundTasks
                 }
 
                 //command = command.Substring(0, command.LastIndexOf("AND"));
-                OledbDatabase db = new OledbDatabase(Variables.dbPath);
+                SQLiteDatabase db = new SQLiteDatabase(Variables.dbPath);
                 return db.GetDataTable(command);
 
 
@@ -945,7 +946,7 @@ namespace Microsat.BackgroundTasks
         {
             return Task.Run(() => {
 
-                OledbDatabase db = new OledbDatabase(Variables.dbConString);
+                SQLiteDatabase db = new SQLiteDatabase(Variables.dbConString);
 
                 return db.GetDataTable("select * from AuxData");
 
@@ -994,7 +995,7 @@ namespace Microsat.BackgroundTasks
         internal static double[] GetWaveLen(int col)
         {
             double[] result = new double[160];
-            OledbDatabase db = new OledbDatabase(Variables.dbPath);
+            SQLiteDatabase db = new SQLiteDatabase(Variables.dbPath);
             DataTable dt = db.GetDataTable("SELECT * FROM SpectrumMap WHERE SpaN="+(col+1).ToString());
             Array.Copy(dt.Rows[0].ItemArray, 1, result, 0, 160);
             return result;
@@ -1117,9 +1118,9 @@ namespace Microsat.BackgroundTasks
         public UInt16 FrameCount;
         public UInt16 PackCount;
         public byte Chanel;
-        public int ImportId=0;
+        public long ImportId=0;
         public byte[] buf_Row;
-        public ROW(byte[] ROW,int id)
+        public ROW(byte[] ROW,long id)
         {
             FrameCount = DataProc.readU16(ROW, 6);
             PackCount = DataProc.readU16(ROW, 8);
@@ -1134,7 +1135,7 @@ namespace Microsat.BackgroundTasks
     {
         public bool isHead = false;
         public bool isTail = false;
-        public RealDataRow(byte[] ROW,int id) : base(ROW,id)
+        public RealDataRow(byte[] ROW,long id) : base(ROW,id)
         {
 
             if ((UInt32)(ROW[32] << 24 | ROW[33] << 16 | ROW[34] << 8 | ROW[35]) == 0xFF4FFF51)
@@ -1169,7 +1170,7 @@ namespace Microsat.BackgroundTasks
         protected double Ox;
         protected double Oy;
         protected double Oz;
-        public AuxDataRow(byte[] ROW,int id) : base(ROW,id)
+        public AuxDataRow(byte[] ROW,long id) : base(ROW,id)
         {
 
             X = 7000 * Math.Cos(Math.PI * ((double)(FrameCount % 360) / 180));//readLength(32);
@@ -1190,28 +1191,28 @@ namespace Microsat.BackgroundTasks
 
         internal void Insert()
         {
-            OledbDatabase sqlExcute = new OledbDatabase(Variables.dbPath);
+            SQLiteDatabase sqlExcute = new SQLiteDatabase(Variables.dbPath);
             try
             {
                 var sql = "insert into AuxData values(@FrameId,@SatelliteId,@GST,@Lat,@Lon,@X,@Y,@Z,@Vx,@Vy,@Vz,@Ox,@Oy,@Oz,@ImportId,@Chanel);";
-                var cmdparams = new List<OleDbParameter>()
+                var cmdparams = new List<SQLiteParameter>()
                 {
-                    new OleDbParameter("FrameId", FrameCount),
-                    new OleDbParameter("SatelliteId","MicroSat"),
-                    new OleDbParameter("GST",GST),
-                    new OleDbParameter("Lat",Lat),
-                    new OleDbParameter("Lon",Lon),
-                    new OleDbParameter("X",X),
-                    new OleDbParameter("Y",Y),
-                    new OleDbParameter("Z",Z),
-                    new OleDbParameter("Vx",Vx),
-                    new OleDbParameter("Vy",Vy),
-                    new OleDbParameter("Vz",Vz),
-                    new OleDbParameter("Ox",Ox),
-                    new OleDbParameter("Oy",Oy),
-                    new OleDbParameter("Oz",Oz),
-                    new OleDbParameter("ImportId",ImportId),
-                    new OleDbParameter("Chanel",Chanel)
+                    new SQLiteParameter("FrameId", FrameCount),
+                    new SQLiteParameter("SatelliteId","MicroSat"),
+                    new SQLiteParameter("GST",GST),
+                    new SQLiteParameter("Lat",Lat),
+                    new SQLiteParameter("Lon",Lon),
+                    new SQLiteParameter("X",X),
+                    new SQLiteParameter("Y",Y),
+                    new SQLiteParameter("Z",Z),
+                    new SQLiteParameter("Vx",Vx),
+                    new SQLiteParameter("Vy",Vy),
+                    new SQLiteParameter("Vz",Vz),
+                    new SQLiteParameter("Ox",Ox),
+                    new SQLiteParameter("Oy",Oy),
+                    new SQLiteParameter("Oz",Oz),
+                    new SQLiteParameter("ImportId",ImportId),
+                    new SQLiteParameter("Chanel",Chanel)
                 };
                 sqlExcute.ExecuteNonQuery(sql, cmdparams);
             }
@@ -1275,28 +1276,28 @@ namespace Microsat.BackgroundTasks
 
         public bool Insert(int ImportId)
         {
-            OledbDatabase sqlExcute = new OledbDatabase(Variables.dbPath);
+            SQLiteDatabase sqlExcute = new SQLiteDatabase(Variables.dbPath);
             try
             {
 
                 var sql = "insert into AuxData values(@FrameId,@SatelliteId,@GST,@Lat,@Lon,@X,@Y,@Z,@Vx,@Vy,@Vz,@Ox,@Oy,@Oz,@ImportId);";
-                var cmdparams = new List<OleDbParameter>()
+                var cmdparams = new List<SQLiteParameter>()
                 {
-                    new OleDbParameter("FrameId", FrmCnt),
-                    new OleDbParameter("SatelliteId","MicroSat"),
-                    new OleDbParameter("GST",GST),
-                    new OleDbParameter("Lat",Lat),
-                    new OleDbParameter("Lon",Lon),
-                    new OleDbParameter("X",X),
-                    new OleDbParameter("Y",Y),
-                    new OleDbParameter("Z",Z),
-                    new OleDbParameter("Vx",Vx),
-                    new OleDbParameter("Vy",Vy),
-                    new OleDbParameter("Vz",Vz),
-                    new OleDbParameter("Ox",Ox),
-                    new OleDbParameter("Oy",Oy),
-                    new OleDbParameter("Oz",Oz),
-                    new OleDbParameter("ImportId",ImportId)
+                    new SQLiteParameter("FrameId", FrmCnt),
+                    new SQLiteParameter("SatelliteId","MicroSat"),
+                    new SQLiteParameter("GST",GST),
+                    new SQLiteParameter("Lat",Lat),
+                    new SQLiteParameter("Lon",Lon),
+                    new SQLiteParameter("X",X),
+                    new SQLiteParameter("Y",Y),
+                    new SQLiteParameter("Z",Z),
+                    new SQLiteParameter("Vx",Vx),
+                    new SQLiteParameter("Vy",Vy),
+                    new SQLiteParameter("Vz",Vz),
+                    new SQLiteParameter("Ox",Ox),
+                    new SQLiteParameter("Oy",Oy),
+                    new SQLiteParameter("Oz",Oz),
+                    new SQLiteParameter("ImportId",ImportId)
                 };
                 return sqlExcute.ExecuteNonQuery(sql, cmdparams);
             }

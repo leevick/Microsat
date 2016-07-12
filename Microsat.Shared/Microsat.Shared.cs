@@ -82,8 +82,8 @@ namespace Microsat.Shared
         public static DataSet dataReport = new DataSet("数据报表库");               //数据报表库
         public static DataTable dataErrSum = dataReport.Tables.Add("错误汇总");     //错误汇总表
         public static DataTable dataErrDetail = dataReport.Tables.Add("错误细则");  //错误细则表
-        public static string dbPath = Environment.CurrentDirectory + "\\db.mdb";     //数据库文件地址
-        public static string dbConString = "Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + dbPath;//数据库连接字符串
+        public static string dbPath = Environment.CurrentDirectory + "\\db";     //数据库文件地址
+        public static string dbConString = "Data Source=" + dbPath;//数据库连接字符串
 
 
         public static long cntErrHead = 0;  //帧头错误数
