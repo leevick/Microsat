@@ -62,7 +62,7 @@ namespace Microsat.Windows
         public Window_Curve()
         {
             InitializeComponent();
-            DisplayMode = GridMode.Four;
+            DisplayMode = GridMode.One;
             u[0] = this.Curve_1;
             u[1] = this.Curve_2;
             u[2] = this.Curve_3;
@@ -73,7 +73,7 @@ namespace Microsat.Windows
             u[3].ScreenIndex = 3;
         }
 
-        public enum GridMode { One,Two,Four};
+        public enum GridMode { One,Two,Three,Four};
         private void Window_Closed(object sender, EventArgs e)
         {
             this.Hide();
