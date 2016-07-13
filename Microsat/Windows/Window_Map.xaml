@@ -5,13 +5,11 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Microsat"
         mc:Ignorable="d"
-        Title="Window_Map" Height="2160" Width="3840" ResizeMode="NoResize" Loaded="windowMap_Loaded" WindowStyle="ToolWindow">
+        Title="Window_Map" Height="768" Width="1024" Loaded="windowMap_Loaded" WindowStyle="ToolWindow" WindowStartupLocation="CenterScreen">
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="1*"/>
-            <ColumnDefinition Width="1*"/>
+            <ColumnDefinition/>
         </Grid.ColumnDefinitions>
-        <WebBrowser x:Name="webMap" Source="{x:Null}"/>
-        <WebBrowser x:Name="webEarth" Grid.Column="1"/>
+        <WebBrowser x:Name="webMap"  Source="{x:Null}" Margin="0,0,0,0" SizeChanged="webMap_SizeChanged"/>
     </Grid>
 </Window>
