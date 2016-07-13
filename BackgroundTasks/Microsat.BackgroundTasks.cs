@@ -43,13 +43,15 @@ namespace Microsat.BackgroundTasks
                     long import_id = (long)(cmd.ExecuteScalar());
                     FileStream fs_input = new FileStream(Variables.str_FilePath, FileMode.Open, FileAccess.Read, FileShare.Read);
                     long total_rows = fs_input.Length / 288;
+
+                   
                     Parallel.For(0, total_rows, i =>
                     {
 
                         FileStream fs_temp = new FileStream(Variables.str_FilePath, FileMode.Open, FileAccess.Read, FileShare.Read);
                         fs_temp.Seek(288*i,SeekOrigin.Begin);
                         byte[] buf_row= new byte[280];
-                        /*
+                        
                         if (buf_row[4] == 0x0A && buf_row[5] == 0x01)
                         {
                             RealDataRow rdl = new RealDataRow(buf_row, import_id);
@@ -57,7 +59,7 @@ namespace Microsat.BackgroundTasks
                             //d_progress = (double)fs_chanel.Position / fs_chanel.Length;
                             rdl.Insert();
                         }
-                        */
+                        
 
                         /*if (fs_chanel.Position % (288 * 1024) == 0)
                         {
