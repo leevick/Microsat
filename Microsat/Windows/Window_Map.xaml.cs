@@ -22,6 +22,8 @@ namespace Microsat
     public partial class Window_Map : Window
     {
         public static String pathMap = "file://127.0.0.1/D$/Amap/Amap.html?zoom=7&disp=true";
+        System.Windows.Point start;
+        System.Windows.Point end;
         public Window_Map()
         {
             InitializeComponent();
@@ -34,11 +36,14 @@ namespace Microsat
         }
         public void DrawRectangle(System.Windows.Point Start, System.Windows.Point End)
         {
-            Uri uri = new Uri(pathMap + "&lat=" + (0.5*Start.X+0.5*End.X).ToString()+ "&lon=" + (0.5*Start.Y+0.5*End.Y).ToString()+"&start_lat="+Start.X.ToString()+"&start_lon="+Start.Y.ToString()+"&end_lat="+End.X.ToString()+"&end_lon="+End.Y.ToString());
+            this.start = Start;
+            this.end = End;
+            Uri uri = new Uri($"{pathMap}&lat={0.5*Start.X+0.5*End.X}&lon={0.5*Start.Y+0.5*End.Y}&start_lat={Start.X}&start_lon={Start.Y}&end_lat={End.X}&end_lon={End.Y}&ch={this.webMap.ActualHeight}px");
             webMap.Navigate(uri);
-            Uri uri_2 = new Uri("file://127.0.0.1/C$/Users/Victor/Desktop/f3earth-master/examples/simple.html");
-            webEarth.Navigate(uri_2);
+          
         }
+
+
         private void windowMap_Loaded(object sender, RoutedEventArgs e)
         {
             Uri uri = new Uri(pathMap);
@@ -48,6 +53,12 @@ namespace Microsat
         {
             this.Hide();
             e.Cancel = true;
+        }
+
+        private void webMap_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            Uri uri = new Uri($"{pathMap}&lat={0.5 * start.X + 0.5 * end.X}&lon={0.5 * start.Y + 0.5 * end.Y}&start_lat={start.X}&start_lon={start.Y}&end_lat={end.X}&end_lon={end.Y}&ch={this.webMap.ActualHeight}px");
+            webMap.Navigate(uri);
         }
     }
 }
