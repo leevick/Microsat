@@ -114,16 +114,16 @@ namespace Microsat
         {
 
             DataTable dt = DataQuery.QueryResult;
-            //App.global_Win_Map.Show();
-            //App.global_Win_Map.DrawRectangle(new Point((double)DataQuery.QueryResult.Rows[0].ItemArray[3], (double)DataQuery.QueryResult.Rows[0].ItemArray[4]), new Point((double)DataQuery.QueryResult.Rows[DataQuery.QueryResult.Rows.Count - 1].ItemArray[3], (double)DataQuery.QueryResult.Rows[DataQuery.QueryResult.Rows.Count - 1].ItemArray[4]));
+            App.global_Win_Map.Show();
+            App.global_Win_Map.DrawRectangle(new Point((double)DataQuery.QueryResult.Rows[0].ItemArray[3], (double)DataQuery.QueryResult.Rows[0].ItemArray[4]), new Point((double)DataQuery.QueryResult.Rows[DataQuery.QueryResult.Rows.Count - 1].ItemArray[3], (double)DataQuery.QueryResult.Rows[DataQuery.QueryResult.Rows.Count - 1].ItemArray[4]));
             //App.global_Win_ImageShow.Refresh(dt);
             //App.global_Win_ImageShow.Show();
             //App.global_Win_3DCube.Show();
             // App.global_Win_3DCube.Refresh(dt);
              App.global_Win_SpecImg.Show();
             //App.global_Win_SpecImg.Refresh(80,0);
-            //App.global_Win_3D.Show();
-            // App.global_Win_3D._3DViewer.Refresh();
+            App.global_Win_3D.Show();
+            App.global_Win_3D._3DViewer.Refresh();
 
             App.global_Win_Curve.Show();
 
@@ -394,6 +394,7 @@ namespace Microsat
             if(App.global_Win_SpecImg != null)
             {
                 App.global_Win_SpecImg.DisplayMode = (Windows.Window_SpecImg.GridMode)comboBox.SelectedIndex;
+                App.global_Win_Curve.DisplayMode = (Windows.Window_Curve.GridMode)comboBox.SelectedIndex;
             }
 
 
