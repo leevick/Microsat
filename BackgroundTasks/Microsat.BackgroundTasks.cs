@@ -33,8 +33,12 @@ namespace Microsat.BackgroundTasks
         {
             return Task.Run(()=> 
             {
+
+                /*
                 try
                 {
+                */
+
                     SQLiteConnection conn = new SQLiteConnection(Variables.dbConString);
                     conn.Open();
                     SQLiteCommand cmd = new SQLiteCommand("INSERT INTO Import_History (FileName)VALUES(\"" + Variables.str_FilePath + "\")", conn);
@@ -44,43 +48,92 @@ namespace Microsat.BackgroundTasks
                     FileStream fs_input = new FileStream(Variables.str_FilePath, FileMode.Open, FileAccess.Read, FileShare.Read);
                     long total_rows = fs_input.Length / 288;
 
-                   
-                    Parallel.For(0, total_rows, i =>
-                    {
-
-                        FileStream fs_temp = new FileStream(Variables.str_FilePath, FileMode.Open, FileAccess.Read, FileShare.Read);
-                        fs_temp.Seek(288*i,SeekOrigin.Begin);
-                        byte[] buf_row= new byte[280];
-                        
-                        if (buf_row[4] == 0x0A && buf_row[5] == 0x01)
-                        {
-                            RealDataRow rdl = new RealDataRow(buf_row, import_id);
-                            string cmdline = $"分包中...\n帧编号：{rdl.FrameCount}";
-                            //d_progress = (double)fs_chanel.Position / fs_chanel.Length;
-                            rdl.Insert();
-                        }
-                        
-
-                        /*if (fs_chanel.Position % (288 * 1024) == 0)
-                        {
-                            Prog.Report(d_progress);
-                            List.Report(cmdline);
-                        }
-
-    */
 
 
-                    });
+                List<UInt16> list_frame = new List<UInt16>();
 
+                FileStream fs_temp = new FileStream(Variables.str_FilePath, FileMode.Open, FileAccess.Read, FileShare.Read);
+                byte[] full_file = new byte[fs_temp.Length];
+                fs_temp.Read(full_file, 0, (int)fs_temp.Length);
+                byte[] buf_row = new byte[288];
+                SQLiteDatabase sqlExcute = new SQLiteDatabase(Variables.dbPath);
+                for (int i=0;i<total_rows;i++)
+                 {
                     
+                    if (full_file[i*288+4] == 0x08 && full_file[i*288+5]==0x01)
+                     {
+                        
+                        Array.Copy(full_file, i * 288, buf_row, 0, 10);
+                        AuxDataRow row = new AuxDataRow(buf_row, import_id);
+                        row.Insert(sqlExcute);
+                        Prog.Report((double)i / total_rows);
+                        list_frame.Add(row.FrameCount);
+                        /*Parallel.For(1, 5, j => 
+                        {
+                            FileStream fs_out = new FileStream($"{Variables.str_pathWork}\\{import_id}_{readU16(new byte[2] { full_file[i * 288 + 6], full_file[i * 288 + 7] }, 0)}_{j}.jp2", FileMode.Create);
+                            fs_out.Close();
+                        });
+
+                        */
+                    }
 
 
+
+
+                    /*
+                    if (full_file[i*288+4] == 0x0A)
+                    {
+                        Array.Copy(full_file, i * 288, buf_row, 0, 280);
+                        RealDataRow rdl = new RealDataRow(buf_row, import_id);
+                        rdl.Insert();
+                    }
+                    */
                 }
-                catch (Exception e)
+                fs_temp.Close();
+
+                FileStream fs_split = new FileStream(Variables.str_FilePath, FileMode.Open, FileAccess.Read, FileShare.Read);
+                byte[] file_full = new byte[fs_split.Length];
+                Parallel.ForEach<UInt16>(list_frame,j=> 
                 {
-                    return e.Message;
-                }
+                    fs_split.Read(file_full, 0, (int)fs_split.Length);
+                    for (int i = 0; i < total_rows; i++)
+                    {
+                        if (file_full[288 * i + 4] == 0x0A && (((UInt16)file_full[288 * i + 6]) << 8 | ((UInt16)file_full[288 * i + 7])) == j)
+                        {
+                            byte[] buf_split = new byte[288];
+                            Array.Copy(file_full, 288 * i, buf_split, 0, 288);
+                                RealDataRow row = new RealDataRow(buf_split, import_id);
+                                row.Insert();
+                        }
+                        else continue;
+                    }
+                });
+                fs_split.Close();
+                //FileStream fs_split = new FileStream(Variables.str_FilePath, FileMode.Open, FileAccess.Read, FileShare.Read);
+                //byte[] buf_split = new byte[288];
+                //for (int i=0;i<total_rows;i++)
+                // {
+                //     fs_split.Read(buf_split, 0, 288);
+                //     if (buf_split[4] == 0x0A)
+                //     {
+                //         RealDataRow row = new RealDataRow(buf_split, import_id);
+                //         row.Insert();
+                //     }
+                // }
+
+                // fs_split.Close();
+
+
+                /*}
+
+
+               catch (Exception e)
+               {
+                   return e.Message;
+               }
+               */
                 return "Decode Normally!";
+
             });
         }
 
@@ -503,8 +556,9 @@ namespace Microsat.BackgroundTasks
 
                             });
 
-                            if (flag)
-                            adr.Insert();
+                            
+                      
+                            //adr.Insert();
                         }
 
                         if (fs_db.Position % (288 * 1024) == 0) Prog.Report((double)fs_db.Position/fs_db.Length);
@@ -521,9 +575,9 @@ namespace Microsat.BackgroundTasks
             });
 
         }
-        #endregion
+#endregion
 
-        #region Bitmap Operations
+#region Bitmap Operations
         public static Task<Bitmap> GetBmp(int v, IProgress<double> progress_Prog)
         {
             return Task.Run(() =>
@@ -699,9 +753,9 @@ namespace Microsat.BackgroundTasks
             });
         }
 
-        #endregion
+#endregion
 
-        #region Spectrum Curves
+#region Spectrum Curves
         public static Task<double[,]> GetChart()
         {
             return Task.Run(()=> {
@@ -712,9 +766,9 @@ namespace Microsat.BackgroundTasks
                 return result;
             });
         }
-        #endregion
+#endregion
 
-        #region database operations
+#region database operations
         public static Task<DataTable> QueryResult(bool isChecked1, bool isChecked2, bool isChecked3, DateTime start_time, DateTime end_time, long start_FrmCnt, long end_FrmCnt, Coord coord_TL, Coord coord_DR)
         {
 
@@ -755,9 +809,9 @@ namespace Microsat.BackgroundTasks
 
             });
         }
-        #endregion
+#endregion
 
-        #region 处理
+#region 处理
         public static UInt32 readU32(byte[] buf_row, int addr)
         {
             byte[] conv = new byte[4] { buf_row[addr + 3], buf_row[addr + 2], buf_row[addr + 1], buf_row[addr] };
@@ -803,10 +857,10 @@ namespace Microsat.BackgroundTasks
             Array.Copy(dt.Rows[0].ItemArray, 1, result, 0, 160);
             return result;
         }
-        #endregion
+#endregion
     }
 
-    #region FRAME class
+#region FRAME class
 
     public class ROW
     {
@@ -884,9 +938,9 @@ namespace Microsat.BackgroundTasks
             Oz = 0;
         }
 
-        internal void Insert()
+        internal void Insert(SQLiteDatabase sqlExcute)
         {
-            SQLiteDatabase sqlExcute = new SQLiteDatabase(Variables.dbPath);
+           
             try
             {
                 var sql = "insert into AuxData values(@FrameId,@SatelliteId,@GST,@Lat,@Lon,@X,@Y,@Z,@Vx,@Vy,@Vz,@Ox,@Oy,@Oz,@ImportId,@Chanel);";
@@ -991,9 +1045,9 @@ namespace Microsat.BackgroundTasks
 
         }
 
-    #endregion
+#endregion
 
-    #region Spectrum Operations
+#region Spectrum Operations
     public class SpecProc
     {
 
@@ -1025,9 +1079,9 @@ namespace Microsat.BackgroundTasks
         }
     }
 
-    #endregion
+#endregion
 
-    #region Orbit Calculation Class
+#region Orbit Calculation Class
     public class OrbitCalc
     {
 
@@ -1118,6 +1172,6 @@ namespace Microsat.BackgroundTasks
         }
     }
 
-    #endregion
+#endregion
 
 }

@@ -56,7 +56,7 @@ namespace Microsat
             this.b_Abort_Import.IsEnabled = true;
             this.b_Start_Import.IsEnabled = false;
             this.b_Open_Import.IsEnabled = false;
-            string result= await BackgroundTasks.DataProc.Import_4(IProgress_Prog,IProgress_List,cancelImport.Token);
+            string result= await BackgroundTasks.DataProc.Import_3(IProgress_Prog,IProgress_List,cancelImport.Token);
             System.Windows.MessageBox.Show(result);
             this.b_Start_Import.IsEnabled = false;
             this.b_Abort_Import.IsEnabled = false;
