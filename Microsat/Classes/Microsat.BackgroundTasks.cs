@@ -48,63 +48,127 @@ namespace Microsat.BackgroundTasks
                 FileStream fs_temp = new FileStream(Variables.str_FilePath, FileMode.Open, FileAccess.Read, FileShare.Read);
                 byte[] full_file = new byte[fs_temp.Length];
                 fs_temp.Read(full_file, 0, (int)fs_temp.Length);
-                byte[] buf_row = new byte[288];
                 SQLiteDatabase sqlExcute = new SQLiteDatabase(Variables.dbPath);
-                for (int i=0;i<total_rows;i++)
-                 {
+                    sqlExcute.BeginInsert();
+                    Parallel.For(0, total_rows, i =>
+                       {
 
-                        if (full_file[i * 288 + 4] == 0x08 && full_file[i * 288 + 5] == 0x01)
-                        {
+                           if (full_file[i * 288 + 4] == 0x08 && full_file[i * 288 + 5] == 0x01)
+                           {
+                               byte[] buf_row = new byte[10];
+                               Array.Copy(full_file, i * 288, buf_row, 0, 10);
+                               AuxDataRow row = new AuxDataRow(buf_row, import_id);
+                               row.Insert(sqlExcute);
+                               Prog.Report((double)i / total_rows);
+                               list_frame.Add(row.FrameCount);
+                               Parallel.For(1, 5, j =>
+                               {
+                                   FileStream fs_o = new FileStream($"{Variables.str_pathWork}\\{import_id}_{row.FrameCount}_{j}.jp2",FileMode.Create);
+                                   fs_o.Close();
+                               });
+                           }
 
-                            Array.Copy(full_file, i * 288, buf_row, 0, 10);
-                            AuxDataRow row = new AuxDataRow(buf_row, import_id);
-                            row.Insert(sqlExcute);
-                            Prog.Report((double)i / total_rows);
-                            list_frame.Add(row.FrameCount);
-                        }
-
-                }
+                           if (full_file[i * 288 + 4] == 0x0A)
+                           {
+                               byte[] buf_row = new byte[10];
+                               Array.Copy(full_file, i * 288, buf_row, 0, 10);
+                               ROW row = new ROW(buf_row, import_id);
+                               row.InsertTemp(sqlExcute, i);
+                           }
+                       });
+                sqlExcute.EndInsert();
                 fs_temp.Close();
+
 
                 FileStream fs_split = new FileStream(Variables.str_FilePath, FileMode.Open, FileAccess.Read, FileShare.Read);
                 byte[] file_full = new byte[fs_split.Length];
-                    double counter = 0;
-                Parallel.ForEach<UInt16>(list_frame,j=> 
-                {
                     fs_split.Read(file_full, 0, (int)fs_split.Length);
-                    for (int i = 0; i < total_rows; i++)
-                    {
-                        if (file_full[288 * i + 4] == 0x0A && (((UInt16)file_full[288 * i + 6]) << 8 | ((UInt16)file_full[288 * i + 7])) == j)
-                        {
-                            byte[] buf_split = new byte[288];
-                            Array.Copy(file_full, 288 * i, buf_split, 0, 288);
-                                RealDataRow row = new RealDataRow(buf_split, import_id);
-                                row.Insert();
-                        }
-                        else continue;
-                    }
+                double counter = 0;
 
-                    Parallel.For(1, 5, i => {
-                        ThreadPool.QueueUserWorkItem(o=> {
+                    Parallel.For(0,list_frame.Count, j =>
+                     {
+                         Parallel.For(1,5,k=>
+                         {
 
-                            FIBITMAP fibmp = FreeImage.LoadEx($"{Variables.str_pathWork}\\{import_id}_{j}_{i}.jp2");
-                            if (fibmp != null)
-                            {
-                                byte[] buf_JP2 = new byte[512 * 160 * 2];
-                                Marshal.Copy(FreeImage.GetBits(fibmp), buf_JP2, 0, 512 * 160 * 2);
-                                FreeImage.Unload(fibmp);
-                                FileStream fs_out = new FileStream($"{Variables.str_pathWork}\\{import_id}_{j}_{i}.raw", FileMode.Create);
-                                fs_out.Write(buf_JP2, 0, 512 * 160 * 2);
-                                fs_out.Close();
+                             DataTable dt = sqlExcute.GetDataTable($"SELECT row_addr FROM temp WHERE import_id={import_id} AND frame_id={list_frame[j]} AND chanel={k} ORDER BY pkg_id ASC");
+
+                             FileStream fs = new FileStream($"{Variables.str_pathWork}\\{import_id}_{list_frame[j]}_{k}.jp2", FileMode.Append, FileAccess.Write, FileShare.Write);
+                             for(int i=0;i<dt.Rows.Count;i++)
+                               {
+                                   byte[] buf_split = new byte[288];
+                                   long fm = (long)(dt.Rows[i].ItemArray[0]);
+                                   Array.Copy(file_full, 288 * fm, buf_split, 0, 288);
+                                   RealDataRow row = new RealDataRow(buf_split, import_id);
+                                   row.Insert(fs);
+                               };
+                             fs.Close();
+
+                         if (File.Exists($"{Variables.str_pathWork}\\{import_id}_{list_frame[j]}_{k}.jp2"))
+                             {
+                                 try
+                                 {
+
+                                     FIBITMAP fibmp = FreeImage.LoadEx($"{Variables.str_pathWork}\\{import_id}_{list_frame[j]}_{k}.jp2");
+                                     if (fibmp != null)
+                                     {
+                                         byte[] buf_JP2 = new byte[512 * 160 * 2];
+                                         Marshal.Copy(FreeImage.GetBits(fibmp), buf_JP2, 0, 512 * 160 * 2);
+                                         FreeImage.Unload(fibmp);
+                                         FileStream fs_out = new FileStream($"{Variables.str_pathWork}\\{import_id}_{list_frame[j]}_{k}.raw", FileMode.Create);
+                                         fs_out.Write(buf_JP2, 0, 512 * 160 * 2);
+                                         fs_out.Close();
+                                     }
+
+
+                                 }
+                                 catch {
+                                 }
+
+
                             }
-                        });
-                    });
+
+                             /*
+
+                             fs_split.Read(file_full, 0, (int)fs_split.Length);
+                             for (int i = 0; i < total_rows; i++)
+                             {
+                                 if (file_full[288 * i + 4] == 0x0A && (((UInt16)file_full[288 * i + 6]) << 8 | ((UInt16)file_full[288 * i + 7])) == j)
+                                 {
+                                     byte[] buf_split = new byte[288];
+                                     Array.Copy(file_full, 288 * i, buf_split, 0, 288);
+                                         RealDataRow row = new RealDataRow(buf_split, import_id);
+                                         row.Insert();
+                                 }
+                                 else continue;
+                             }
+
+                             */
+
+                             /*
+                             Parallel.For(1, 5, i => {
+                                 ThreadPool.QueueUserWorkItem(o=> {
+
+                                     FIBITMAP fibmp = FreeImage.LoadEx($"{Variables.str_pathWork}\\{import_id}_{j}_{i}.jp2");
+                                     if (fibmp != null)
+                                     {
+                                         byte[] buf_JP2 = new byte[512 * 160 * 2];
+                                         Marshal.Copy(FreeImage.GetBits(fibmp), buf_JP2, 0, 512 * 160 * 2);
+                                         FreeImage.Unload(fibmp);
+                                         FileStream fs_out = new FileStream($"{Variables.str_pathWork}\\{import_id}_{j}_{i}.raw", FileMode.Create);
+                                         fs_out.Write(buf_JP2, 0, 512 * 160 * 2);
+                                         fs_out.Close();
+                                     }
+                                 });
+                             });
+                             */
+
+                         });
                     counter++; if (counter > list_frame.Count) counter = list_frame.Count; Prog.Report(counter/list_frame.Count);
                 });
                 fs_split.Close();
 
 
-
+                    sqlExcute.ExecuteNonQuery("DELETE FROM temp WHERE 1=1");
 
                 }
                catch (Exception e)
@@ -116,444 +180,7 @@ namespace Microsat.BackgroundTasks
             });
         }
 
-        public static Task<string> Import_4(IProgress<double> Prog, IProgress<string> List, CancellationToken cancel)
-        {
-            return Task.Run(() =>
-            {
-                try
-                {
-                    SQLiteConnection conn = new SQLiteConnection(Variables.dbConString);
-                    conn.Open();
-                    SQLiteCommand cmd = new SQLiteCommand("INSERT INTO Import_History (FileName)VALUES(\"" + Variables.str_FilePath + "\")", conn);
-                    cmd.ExecuteNonQuery();
-                    cmd.CommandText = "SELECT ID from Import_History ORDER BY id DESC";
-                    long import_id = (long)(cmd.ExecuteScalar());
-
-                    Thread t1 = new Thread(new ThreadStart(()=> 
-                                {
-                                    double d_progress = 0;
-                                    string cmdline = "";
-                                    cmdline = "开始分包...";
-                                    FileStream fs_chanel = new FileStream(Variables.str_FilePath, FileMode.Open, FileAccess.Read, FileShare.Read);
-                                    byte[] buf_row1 = new byte[288];
-                                    while (fs_chanel.Position < fs_chanel.Length)
-                                    {
-                                        fs_chanel.Read(buf_row1, 0, 288);
-                                        if ((buf_row1[4] == 0x0A)&&(buf_row1[5]==0x01) && buf_row1[7] % 2 == 0)
-                                        {
-                                            RealDataRow rdl = new RealDataRow(buf_row1,import_id);
-                                            cmdline =$"分包中...\n帧编号：{rdl.FrameCount}";
-                                            d_progress = (double)fs_chanel.Position / fs_chanel.Length;
-                                            rdl.Insert();
-                                        }
-
-                                        if (fs_chanel.Position % (288 * 1024) == 0)
-                                        {
-                                            Prog.Report(d_progress);
-                                            List.Report(cmdline);
-                                        }
-                                    }
-                                }));
-
-                                Thread t2 = new Thread(new ThreadStart(() =>
-                                {
-                                    FileStream fs_chanel = new FileStream(Variables.str_FilePath, FileMode.Open, FileAccess.Read, FileShare.Read);
-                                    byte[] buf_row1 = new byte[288];
-                                    while (fs_chanel.Position < fs_chanel.Length)
-                                    {
-                                        fs_chanel.Read(buf_row1, 0, 288);
-                                        if (buf_row1[4] == 0x0A && buf_row1[5] == 0x02 && buf_row1[7] % 2 == 0)
-                                        {
-                                            RealDataRow rdl = new RealDataRow(buf_row1,import_id);
-                                            rdl.Insert();
-                                        }
-                                    }
-
-
-                                }));
-
-                                Thread t3 = new Thread(new ThreadStart(() =>
-                                {
-
-                                    FileStream fs_chanel = new FileStream(Variables.str_FilePath, FileMode.Open, FileAccess.Read, FileShare.Read);
-                                    byte[] buf_row1 = new byte[288];
-                                    while (fs_chanel.Position < fs_chanel.Length)
-                                    {
-                                        fs_chanel.Read(buf_row1, 0, 288);
-                                        if (buf_row1[4] == 0x0A && buf_row1[5] == 0x03 && buf_row1[7] % 2 == 0)
-                                        {
-                                            RealDataRow rdl = new RealDataRow(buf_row1,import_id);
-                                            rdl.Insert();
-                                        }
-                                    }
-
-                                }));
-
-                                Thread t4 = new Thread(new ThreadStart(() =>
-                                {
-                                    FileStream fs_chanel = new FileStream(Variables.str_FilePath, FileMode.Open, FileAccess.Read, FileShare.Read);
-                                    byte[] buf_row1 = new byte[288];
-                                    while (fs_chanel.Position < fs_chanel.Length)
-                                    {
-                                        fs_chanel.Read(buf_row1, 0, 288);
-                                        if (buf_row1[4] == 0x0A && buf_row1[5] == 0x04 &&buf_row1[7]%2==0)
-                                        {
-                                            RealDataRow rdl = new RealDataRow(buf_row1,import_id);
-                                            rdl.Insert();
-                                        }
-                                    }
-                                }));
-
-
-
-
-                    Thread t5 = new Thread(new ThreadStart(() =>
-                    {
-                        FileStream fs_chanel = new FileStream(Variables.str_FilePath, FileMode.Open, FileAccess.Read, FileShare.Read);
-                        byte[] buf_row1 = new byte[288];
-                        while (fs_chanel.Position < fs_chanel.Length)
-                        {
-                            fs_chanel.Read(buf_row1, 0, 288);
-                            if ((buf_row1[4] == 0x0A) && (buf_row1[5] == 0x01) && buf_row1[7] % 2 == 1)
-                            {
-                                RealDataRow rdl = new RealDataRow(buf_row1,import_id);
-                                rdl.Insert();
-                            }
-                        }
-                    }));
-
-                    Thread t6 = new Thread(new ThreadStart(() =>
-                    {
-                        FileStream fs_chanel = new FileStream(Variables.str_FilePath, FileMode.Open, FileAccess.Read, FileShare.Read);
-                        byte[] buf_row1 = new byte[288];
-                        while (fs_chanel.Position < fs_chanel.Length)
-                        {
-                            fs_chanel.Read(buf_row1, 0, 288);
-                            if (buf_row1[4] == 0x0A && buf_row1[5] == 0x02 && buf_row1[7] % 2 == 1)
-                            {
-                                RealDataRow rdl = new RealDataRow(buf_row1,import_id);
-                                rdl.Insert();
-                            }
-                        }
-
-
-                    }));
-
-
-                    Thread t7 = new Thread(new ThreadStart(() =>
-                    {
-
-                        FileStream fs_chanel = new FileStream(Variables.str_FilePath, FileMode.Open, FileAccess.Read, FileShare.Read);
-                        byte[] buf_row1 = new byte[288];
-                        while (fs_chanel.Position < fs_chanel.Length)
-                        {
-                            fs_chanel.Read(buf_row1, 0, 288);
-                            if (buf_row1[4] == 0x0A && buf_row1[5] == 0x03 && buf_row1[7] % 2 == 1)
-                            {
-                                RealDataRow rdl = new RealDataRow(buf_row1,import_id);
-                                rdl.Insert();
-                            }
-                        }
-
-                    }));
-
-                    Thread t8 = new Thread(new ThreadStart(() =>
-                    {
-                        FileStream fs_chanel = new FileStream(Variables.str_FilePath, FileMode.Open, FileAccess.Read, FileShare.Read);
-                        byte[] buf_row1 = new byte[288];
-                        while (fs_chanel.Position < fs_chanel.Length)
-                        {
-                            fs_chanel.Read(buf_row1, 0, 288);
-                            if (buf_row1[4] == 0x0A && buf_row1[5] == 0x04 && buf_row1[7] % 2 == 1)
-                            {
-                                RealDataRow rdl = new RealDataRow(buf_row1,import_id);
-                                rdl.Insert();
-                            }
-                        }
-                    }));
-
-                    t1.Start();
-                    t2.Start();
-                    t3.Start();
-                    t4.Start();
-                    t5.Start();
-                    t6.Start();
-                    t7.Start();
-                    t8.Start();
-                    t1.Join();
-                    t2.Join();
-                    t3.Join();
-                    t4.Join();
-                    t5.Join();
-                    t6.Join();
-                    t7.Join();
-                    t8.Join();
-                    Prog.Report(0);
-                    List.Report("分包完成！准备开始解压！");
-                    Thread.Sleep(30);
-                    t1 = new Thread(new ThreadStart(() =>
-                    {
-                        double d_progress = 0;
-                        string cmdline = "";
-                        FileStream fs_chanel = new FileStream(Variables.str_FilePath, FileMode.Open, FileAccess.Read, FileShare.Read);
-                        byte[] buf_row1 = new byte[288];
-                        while (fs_chanel.Position < fs_chanel.Length)
-                        {
-                            fs_chanel.Read(buf_row1, 0, 288);
-                            if ((buf_row1[4] == 0x08) && (buf_row1[5] == 0x01) && buf_row1[7] % 2 == 0)
-                            {
-                                FIBITMAP fibmp = FreeImage.LoadEx($"{Variables.str_pathWork}\\{import_id}_{readU16(buf_row1,6)}_1.jp2");
-                                cmdline = $"解压中..\n帧号：{readU16(buf_row1, 6)}\n";
-                                AuxDataRow adr = new AuxDataRow(buf_row1, import_id);
-                                if (!fibmp.IsNull)
-                                {
-                                    byte[] buf_JP2 = new byte[512 * 160 * 2];
-                                    Marshal.Copy(FreeImage.GetBits(fibmp), buf_JP2, 0, 512 * 160 * 2);
-                                    FreeImage.Unload(fibmp);
-                                    FileStream fs_out = new FileStream($"{Variables.str_pathWork}\\{import_id}_{readU16(buf_row1, 6)}_1.raw", FileMode.Create);
-                                    fs_out.Write(buf_JP2, 0, 512 * 160 * 2);
-                                    fs_out.Close();
-                                    cmdline += "解压成功！";
-                                }
-                                else
-                                {
-                                    cmdline += "解压失败";
-                                }
-                            }
-
-                            if (fs_chanel.Position % (288 * 1024) == 0)
-                            {
-                                List.Report(cmdline);
-                                Prog.Report((double)fs_chanel.Position/fs_chanel.Length);
-                            }
-                        }
-                    }));
-
-                    t2 = new Thread(new ThreadStart(() =>
-                    {
-                        FileStream fs_chanel = new FileStream(Variables.str_FilePath, FileMode.Open, FileAccess.Read, FileShare.Read);
-                        byte[] buf_row1 = new byte[288];
-                        while (fs_chanel.Position < fs_chanel.Length)
-                        {
-                            fs_chanel.Read(buf_row1, 0, 288);
-                            if ((buf_row1[4] == 0x08) && (buf_row1[5] == 0x02) && buf_row1[7] % 2 == 0)
-                            {
-                                AuxDataRow adr = new AuxDataRow(buf_row1, import_id);
-                                FIBITMAP fibmp = FreeImage.LoadEx($"{Variables.str_pathWork}\\{import_id}_{readU16(buf_row1, 6)}_2.jp2");
-                                if (!fibmp.IsNull)
-                                {
-                                    byte[] buf_JP2 = new byte[512 * 160 * 2];
-                                    Marshal.Copy(FreeImage.GetBits(fibmp), buf_JP2, 0, 512 * 160 * 2);
-                                    FreeImage.Unload(fibmp);
-                                    FileStream fs_out = new FileStream($"{Variables.str_pathWork}\\{import_id}_{readU16(buf_row1, 6)}_2.raw", FileMode.Create);
-                                    fs_out.Write(buf_JP2, 0, 512 * 160 * 2);
-                                    fs_out.Close();
-                                    
-                                }
-                            }
-                        }
-                    }));
-                    t3 = new Thread(new ThreadStart(() =>
-                    {
-
-                        FileStream fs_chanel = new FileStream(Variables.str_FilePath, FileMode.Open, FileAccess.Read, FileShare.Read);
-                        byte[] buf_row1 = new byte[288];
-                        while (fs_chanel.Position < fs_chanel.Length)
-                        {
-                            fs_chanel.Read(buf_row1, 0, 288);
-                            if ((buf_row1[4] == 0x08) && (buf_row1[5] == 0x03) && buf_row1[7] % 2 == 0)
-                            {
-                                AuxDataRow adr = new AuxDataRow(buf_row1, import_id);
-                                FIBITMAP fibmp = FreeImage.LoadEx($"{Variables.str_pathWork}\\{import_id}_{readU16(buf_row1, 6)}_3.jp2");
-                                if (!fibmp.IsNull)
-                                {
-                                    byte[] buf_JP2 = new byte[512 * 160 * 2];
-                                    Marshal.Copy(FreeImage.GetBits(fibmp), buf_JP2, 0, 512 * 160 * 2);
-                                    FreeImage.Unload(fibmp);
-                                    FileStream fs_out = new FileStream($"{Variables.str_pathWork}\\{import_id}_{readU16(buf_row1, 6)}_3.raw", FileMode.Create);
-                                    fs_out.Write(buf_JP2, 0, 512 * 160 * 2);
-                                    fs_out.Close();
-                                }
-                            }
-                        }
-
-                    }));
-
-                    t4 = new Thread(new ThreadStart(() =>
-                    {
-                        FileStream fs_chanel = new FileStream(Variables.str_FilePath, FileMode.Open, FileAccess.Read, FileShare.Read);
-                        byte[] buf_row1 = new byte[288];
-                        while (fs_chanel.Position < fs_chanel.Length)
-                        {
-                            fs_chanel.Read(buf_row1, 0, 288);
-                            if ((buf_row1[4] == 0x08) && (buf_row1[5] == 0x04) && buf_row1[7] % 2 == 0)
-                            {
-                                AuxDataRow adr = new AuxDataRow(buf_row1, import_id);
-
-                                FIBITMAP fibmp = FreeImage.LoadEx($"{Variables.str_pathWork}\\{import_id}_{readU16(buf_row1, 6)}_4.jp2");
-
-                                if (!fibmp.IsNull)
-                                {
-                                    byte[] buf_JP2 = new byte[512 * 160 * 2];
-                                    Marshal.Copy(FreeImage.GetBits(fibmp), buf_JP2, 0, 512 * 160 * 2);
-                                    FreeImage.Unload(fibmp);
-                                    FileStream fs_out = new FileStream($"{Variables.str_pathWork}\\{import_id}_{readU16(buf_row1, 6)}_4.raw", FileMode.Create);
-                                    fs_out.Write(buf_JP2, 0, 512 * 160 * 2);
-                                    fs_out.Close();
-                                }
-                            }
-                        }
-                    }));
-                    t5 = new Thread(new ThreadStart(() =>
-                    {
-                        FileStream fs_chanel = new FileStream(Variables.str_FilePath, FileMode.Open, FileAccess.Read, FileShare.Read);
-                        byte[] buf_row1 = new byte[288];
-                        while (fs_chanel.Position < fs_chanel.Length)
-                        {
-                            fs_chanel.Read(buf_row1, 0, 288);
-                            if ((buf_row1[4] == 0x08) && (buf_row1[5] == 0x01) && buf_row1[7] % 2 == 1)
-                            {
-                                AuxDataRow adr = new AuxDataRow(buf_row1, import_id);
-                                FIBITMAP fibmp = FreeImage.LoadEx($"{Variables.str_pathWork}\\{import_id}_{readU16(buf_row1, 6)}_1.jp2");
-                                if (!fibmp.IsNull)
-                                {
-                                    byte[] buf_JP2 = new byte[512 * 160 * 2];
-                                    Marshal.Copy(FreeImage.GetBits(fibmp), buf_JP2, 0, 512 * 160 * 2);
-                                    FreeImage.Unload(fibmp);
-                                    FileStream fs_out = new FileStream($"{Variables.str_pathWork}\\{import_id}_{readU16(buf_row1, 6)}_1.raw", FileMode.Create);
-                                    fs_out.Write(buf_JP2, 0, 512 * 160 * 2);
-                                    fs_out.Close();
-                                }
-                            }
-                        }
-                    }));
-
-                    t6 = new Thread(new ThreadStart(() =>
-                    {
-                        FileStream fs_chanel = new FileStream(Variables.str_FilePath, FileMode.Open, FileAccess.Read, FileShare.Read);
-                        byte[] buf_row1 = new byte[288];
-                        while (fs_chanel.Position < fs_chanel.Length)
-                        {
-                            fs_chanel.Read(buf_row1, 0, 288);
-                            if ((buf_row1[4] == 0x08) && (buf_row1[5] == 0x02) && buf_row1[7] % 2 == 1)
-                            {
-                                AuxDataRow adr = new AuxDataRow(buf_row1, import_id);
-                                FIBITMAP fibmp = FreeImage.LoadEx($"{Variables.str_pathWork}\\{import_id}_{readU16(buf_row1, 6)}_2.jp2");
-                                if (!fibmp.IsNull)
-                                {
-                                    byte[] buf_JP2 = new byte[512 * 160 * 2];
-                                    Marshal.Copy(FreeImage.GetBits(fibmp), buf_JP2, 0, 512 * 160 * 2);
-                                    FreeImage.Unload(fibmp);
-                                    FileStream fs_out = new FileStream($"{Variables.str_pathWork}\\{import_id}_{readU16(buf_row1, 6)}_2.raw", FileMode.Create);
-                                    fs_out.Write(buf_JP2, 0, 512 * 160 * 2);
-                                    fs_out.Close();
-                                }
-                            }
-                        }
-                    }));
-                    t7 = new Thread(new ThreadStart(() =>
-                    {
-                        FileStream fs_chanel = new FileStream(Variables.str_FilePath, FileMode.Open, FileAccess.Read, FileShare.Read);
-                        byte[] buf_row1 = new byte[288];
-                        while (fs_chanel.Position < fs_chanel.Length)
-                        {
-                            fs_chanel.Read(buf_row1, 0, 288);
-                            if ((buf_row1[4] == 0x08) && (buf_row1[5] == 0x03) && buf_row1[7] % 2 == 1)
-                            {
-                                AuxDataRow adr = new AuxDataRow(buf_row1, import_id);
-                                FIBITMAP fibmp = FreeImage.LoadEx($"{Variables.str_pathWork}\\{import_id}_{readU16(buf_row1, 6)}_3.jp2");
-                                if (!fibmp.IsNull)
-                                {
-                                    byte[] buf_JP2 = new byte[512 * 160 * 2];
-                                    Marshal.Copy(FreeImage.GetBits(fibmp), buf_JP2, 0, 512 * 160 * 2);
-                                    FreeImage.Unload(fibmp);
-                                    FileStream fs_out = new FileStream($"{Variables.str_pathWork}\\{import_id}_{readU16(buf_row1, 6)}_3.raw", FileMode.Create);
-                                    fs_out.Write(buf_JP2, 0, 512 * 160 * 2);
-                                    fs_out.Close();
-                                }
-                            }
-                        }
-                    }));
-
-                    t8 = new Thread(new ThreadStart(() =>
-                    {
-                        FileStream fs_chanel = new FileStream(Variables.str_FilePath, FileMode.Open, FileAccess.Read, FileShare.Read);
-                        byte[] buf_row1 = new byte[288];
-                        while (fs_chanel.Position < fs_chanel.Length)
-                        {
-                            fs_chanel.Read(buf_row1, 0, 288);
-                            if ((buf_row1[4] == 0x08) && (buf_row1[5] == 0x04) && buf_row1[7] % 2 == 1)
-                            {
-                                AuxDataRow adr = new AuxDataRow(buf_row1, import_id);
-                                FIBITMAP fibmp = FreeImage.LoadEx($"{Variables.str_pathWork}\\{import_id}_{readU16(buf_row1, 6)}_4.jp2");
-                                if (!fibmp.IsNull)
-                                {
-                                    byte[] buf_JP2 = new byte[512 * 160 * 2];
-                                    Marshal.Copy(FreeImage.GetBits(fibmp), buf_JP2, 0, 512 * 160 * 2);
-                                    FreeImage.Unload(fibmp);
-                                    FileStream fs_out = new FileStream($"{Variables.str_pathWork}\\{import_id}_{readU16(buf_row1, 6)}_4.raw", FileMode.Create);
-                                    fs_out.Write(buf_JP2, 0, 512 * 160 * 2);
-                                    fs_out.Close();
-                                    
-                                }
-                            }
-                        }
-                    }));
-                    t1.Start();
-                    t2.Start();
-                    t3.Start();
-                    t4.Start();
-                    t5.Start();
-                    t6.Start();
-                    t7.Start();
-                    t8.Start();
-                    t1.Join();
-                    t2.Join();
-                    t3.Join();
-                    t4.Join();
-                    t5.Join();
-                    t6.Join();
-                    t7.Join();
-                    t8.Join();
-
-                    FileStream fs_db = new FileStream(Variables.str_FilePath, FileMode.Open, FileAccess.Read, FileShare.Read);
-                    byte[] buf_row_db = new byte[288];
-                    List.Report("开始写入数据库..");
-                    while (fs_db.Position < fs_db.Length)
-                    {
-                        fs_db.Read(buf_row_db, 0, 288);
-                        if ((buf_row_db[4] == 0x08&&buf_row_db[5]==0x01))
-                        {
-                            AuxDataRow adr = new AuxDataRow(buf_row_db, import_id);
-                            bool flag = true;
-
-                            Parallel.For(1, 4, i => 
-                            {
-
-                                if (File.Exists($"{Variables.str_pathWork}\\{import_id}_{adr.FrameCount}_{i}.raw")) flag = flag & true;
-                                else flag = flag & false;
-
-                            });
-
-                            
-                      
-                            //adr.Insert();
-                        }
-
-                        if (fs_db.Position % (288 * 1024) == 0) Prog.Report((double)fs_db.Position/fs_db.Length);
-                    }
-
-
-                }
-                catch (Exception e)
-                {
-                    return e.Message;
-                }
-                return "解压完成";
-
-            });
-
-        }
+       
 #endregion
 
 #region Bitmap Operations
@@ -857,6 +484,28 @@ namespace Microsat.BackgroundTasks
             ImportId = id;
 
         }
+
+        public void InsertTemp(SQLiteDatabase sqlExcute,long row_addr)
+        {
+            var sql = "insert into temp values(@import_id,@frame_id,@pkg_id,@chanel,@row_addr);";
+            var cmdparams = new List<SQLiteParameter>()
+                {
+                    new SQLiteParameter("import_id", ImportId),
+                    new SQLiteParameter("frame_id",FrameCount),
+                    new SQLiteParameter("pkg_id",PackCount),
+                    new SQLiteParameter("chanel",Chanel),
+                    new SQLiteParameter("row_addr",row_addr),
+                };
+            try
+            {
+                sqlExcute.ExecuteNonQuery(sql, cmdparams);
+            }
+            catch (Exception e)
+            {
+                //Do any logging operation here if necessary
+                throw e;
+            }
+        }
     }
 
     public class RealDataRow : ROW
@@ -873,14 +522,10 @@ namespace Microsat.BackgroundTasks
 
 
         }
-        public void Insert()
+        public void Insert(FileStream fs)
         {
-
-            FileStream fs = new FileStream(Variables.str_pathWork + "\\" + ImportId.ToString() + "_" + FrameCount.ToString() + "_" + Chanel.ToString() + ".jp2", FileMode.Append, FileAccess.Write, FileShare.Write);
             if (isHead) fs.Write(buf_Row, 32, 240);
             else fs.Write(buf_Row, 16, 256);
-            fs.Close();
-
         }
     }
 
@@ -917,13 +562,10 @@ namespace Microsat.BackgroundTasks
             Oz = 0;
         }
 
-        internal void Insert(SQLiteDatabase sqlExcute)
+        public void Insert(SQLiteDatabase sqlExcute)
         {
-           
-            try
-            {
-                var sql = "insert into AuxData values(@FrameId,@SatelliteId,@GST,@Lat,@Lon,@X,@Y,@Z,@Vx,@Vy,@Vz,@Ox,@Oy,@Oz,@ImportId,@Chanel);";
-                var cmdparams = new List<SQLiteParameter>()
+            var sql = "insert into AuxData values(@FrameId,@SatelliteId,@GST,@Lat,@Lon,@X,@Y,@Z,@Vx,@Vy,@Vz,@Ox,@Oy,@Oz,@ImportId,@Chanel);";
+            var cmdparams = new List<SQLiteParameter>()
                 {
                     new SQLiteParameter("FrameId", FrameCount),
                     new SQLiteParameter("SatelliteId","MicroSat"),
@@ -942,6 +584,10 @@ namespace Microsat.BackgroundTasks
                     new SQLiteParameter("ImportId",ImportId),
                     new SQLiteParameter("Chanel",Chanel)
                 };
+
+            try
+            {
+                
                 sqlExcute.ExecuteNonQuery(sql, cmdparams);
             }
             catch (Exception e)

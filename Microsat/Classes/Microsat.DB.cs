@@ -12,6 +12,7 @@ namespace Microsat.DB
     {
         String dbConnection;
         SQLiteConnection cnn;
+        SQLiteTransaction trans;
 
         #region ctor
         /// <summary>
@@ -55,6 +56,7 @@ namespace Microsat.DB
         /// </summary>
         /// <param name="sql">The SQL to run</param>
         /// <returns>A DataTable containing the result set.</returns>
+
         public DataTable GetDataTable(string sql)
         {
             DataTable dt = new DataTable();
@@ -131,36 +133,46 @@ namespace Microsat.DB
             return successState;
         }
 
+
+        public void BeginInsert()
+        {
+            cnn.Open();
+            trans = cnn.BeginTransaction();
+
+        }
+
+        public void EndInsert()
+        {
+            try
+            {
+                trans.Commit();
+            }
+            catch
+            {
+                trans.Rollback();
+            }
+            finally
+            {
+                trans.Dispose();
+                cnn.Close();
+            }
+
+        }
+
+
         public bool ExecuteNonQuery(string sql, IList<SQLiteParameter> cmdparams)
         {
             bool successState = false;
-            cnn.Open();
-            using (SQLiteTransaction mytrans = cnn.BeginTransaction())
-            {
-                SQLiteCommand mycommand = new SQLiteCommand(sql, cnn, mytrans);
-                try
-                {
+                SQLiteCommand mycommand = new SQLiteCommand(sql, cnn, trans);
                     mycommand.Parameters.AddRange(cmdparams.ToArray());
                     mycommand.CommandTimeout = 180;
                     mycommand.ExecuteNonQuery();
-                    mytrans.Commit();
                     successState = true;
-                    cnn.Close();
-                }
-                catch (Exception e)
-                {
-                    mytrans.Rollback();
-                    throw e;
-                }
-                finally
-                {
-                    mycommand.Dispose();
-                    cnn.Close();
-                }
-
-            }
             return successState;
         }
+
+
+
 
         /// <summary>
         ///     暂时用不到

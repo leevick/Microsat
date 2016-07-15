@@ -40,12 +40,7 @@ namespace Microsat
             for(int i=0;i<4;i++){
                 WindowSetting[i].ScreenIndex = i;
             }
-            
-
         }
-
-
-
         #region 数据管
         private CancellationTokenSource cancelImport = new CancellationTokenSource();
         private async void b_Start_Import_Click(object sender, RoutedEventArgs e)
