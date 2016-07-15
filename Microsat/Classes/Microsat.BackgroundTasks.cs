@@ -25,19 +25,14 @@ namespace Microsat.BackgroundTasks
     public class DataProc
     {
         #region File Operations
-
-
-
-
         public static Task<string> Import_3(IProgress<double> Prog, IProgress<string> List, CancellationToken cancel)
         {
             return Task.Run(()=> 
             {
 
-                /*
                 try
                 {
-                */
+
 
                     SQLiteConnection conn = new SQLiteConnection(Variables.dbConString);
                     conn.Open();
@@ -48,8 +43,6 @@ namespace Microsat.BackgroundTasks
                     FileStream fs_input = new FileStream(Variables.str_FilePath, FileMode.Open, FileAccess.Read, FileShare.Read);
                     long total_rows = fs_input.Length / 288;
 
-
-
                 List<UInt16> list_frame = new List<UInt16>();
 
                 FileStream fs_temp = new FileStream(Variables.str_FilePath, FileMode.Open, FileAccess.Read, FileShare.Read);
@@ -59,40 +52,23 @@ namespace Microsat.BackgroundTasks
                 SQLiteDatabase sqlExcute = new SQLiteDatabase(Variables.dbPath);
                 for (int i=0;i<total_rows;i++)
                  {
-                    
-                    if (full_file[i*288+4] == 0x08 && full_file[i*288+5]==0x01)
-                     {
-                        
-                        Array.Copy(full_file, i * 288, buf_row, 0, 10);
-                        AuxDataRow row = new AuxDataRow(buf_row, import_id);
-                        row.Insert(sqlExcute);
-                        Prog.Report((double)i / total_rows);
-                        list_frame.Add(row.FrameCount);
-                        /*Parallel.For(1, 5, j => 
+
+                        if (full_file[i * 288 + 4] == 0x08 && full_file[i * 288 + 5] == 0x01)
                         {
-                            FileStream fs_out = new FileStream($"{Variables.str_pathWork}\\{import_id}_{readU16(new byte[2] { full_file[i * 288 + 6], full_file[i * 288 + 7] }, 0)}_{j}.jp2", FileMode.Create);
-                            fs_out.Close();
-                        });
 
-                        */
-                    }
+                            Array.Copy(full_file, i * 288, buf_row, 0, 10);
+                            AuxDataRow row = new AuxDataRow(buf_row, import_id);
+                            row.Insert(sqlExcute);
+                            Prog.Report((double)i / total_rows);
+                            list_frame.Add(row.FrameCount);
+                        }
 
-
-
-
-                    /*
-                    if (full_file[i*288+4] == 0x0A)
-                    {
-                        Array.Copy(full_file, i * 288, buf_row, 0, 280);
-                        RealDataRow rdl = new RealDataRow(buf_row, import_id);
-                        rdl.Insert();
-                    }
-                    */
                 }
                 fs_temp.Close();
 
                 FileStream fs_split = new FileStream(Variables.str_FilePath, FileMode.Open, FileAccess.Read, FileShare.Read);
                 byte[] file_full = new byte[fs_split.Length];
+                    double counter = 0;
                 Parallel.ForEach<UInt16>(list_frame,j=> 
                 {
                     fs_split.Read(file_full, 0, (int)fs_split.Length);
@@ -107,31 +83,34 @@ namespace Microsat.BackgroundTasks
                         }
                         else continue;
                     }
+
+                    Parallel.For(1, 5, i => {
+                        ThreadPool.QueueUserWorkItem(o=> {
+
+                            FIBITMAP fibmp = FreeImage.LoadEx($"{Variables.str_pathWork}\\{import_id}_{j}_{i}.jp2");
+                            if (fibmp != null)
+                            {
+                                byte[] buf_JP2 = new byte[512 * 160 * 2];
+                                Marshal.Copy(FreeImage.GetBits(fibmp), buf_JP2, 0, 512 * 160 * 2);
+                                FreeImage.Unload(fibmp);
+                                FileStream fs_out = new FileStream($"{Variables.str_pathWork}\\{import_id}_{j}_{i}.raw", FileMode.Create);
+                                fs_out.Write(buf_JP2, 0, 512 * 160 * 2);
+                                fs_out.Close();
+                            }
+                        });
+                    });
+                    counter++; if (counter > list_frame.Count) counter = list_frame.Count; Prog.Report(counter/list_frame.Count);
                 });
                 fs_split.Close();
-                //FileStream fs_split = new FileStream(Variables.str_FilePath, FileMode.Open, FileAccess.Read, FileShare.Read);
-                //byte[] buf_split = new byte[288];
-                //for (int i=0;i<total_rows;i++)
-                // {
-                //     fs_split.Read(buf_split, 0, 288);
-                //     if (buf_split[4] == 0x0A)
-                //     {
-                //         RealDataRow row = new RealDataRow(buf_split, import_id);
-                //         row.Insert();
-                //     }
-                // }
-
-                // fs_split.Close();
 
 
-                /*}
 
 
+                }
                catch (Exception e)
                {
                    return e.Message;
                }
-               */
                 return "Decode Normally!";
 
             });
