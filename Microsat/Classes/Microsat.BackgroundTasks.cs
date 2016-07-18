@@ -597,7 +597,9 @@ namespace Microsat.BackgroundTasks
             }
         }
     }
+#pragma warning disable CS0659 // 类型重写 Object.Equals(object o)，但不重写 Object.GetHashCode()
     public class FRAME
+#pragma warning restore CS0659 // 类型重写 Object.Equals(object o)，但不重写 Object.GetHashCode()
     {
         public List<RealDataRow>[] ItemList;
         

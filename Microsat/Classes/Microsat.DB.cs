@@ -120,7 +120,9 @@ namespace Microsat.DB
                     successState = true;
                     cnn.Close();
                 }
+#pragma warning disable CS0168 // 声明了变量，但从未使用过
                 catch (Exception e)
+#pragma warning restore CS0168 // 声明了变量，但从未使用过
                 {
                     mytrans.Rollback();
                 }

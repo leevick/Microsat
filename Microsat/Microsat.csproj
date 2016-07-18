@@ -75,6 +75,10 @@
     <Reference Include="DynamicDataDisplay">
       <HintPath>.\DynamicDataDisplay.dll</HintPath>
     </Reference>
+    <Reference Include="FirstFloor.ModernUI, Version=1.0.9.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\MUI\mui\1.0\FirstFloor.ModernUI\FirstFloor.ModernUI\bin\Release\FirstFloor.ModernUI.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.configuration" />
     <Reference Include="System.Data" />
@@ -112,6 +116,9 @@
     <Compile Include="Classes\Microsat.DB.cs" />
     <Compile Include="Classes\Microsat.Shared.cs" />
     <Compile Include="Classes\Microsat.SpecProc.cs" />
+    <Compile Include="Pages\Data_Import.xaml.cs">
+      <DependentUpon>Data_Import.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UserControls\Ctrl_3DView.xaml.cs">
       <DependentUpon>Ctrl_3DView.xaml</DependentUpon>
     </Compile>
@@ -149,6 +156,10 @@
     <Compile Include="Windows\Window_SpecImg.xaml.cs">
       <DependentUpon>Window_SpecImg.xaml</DependentUpon>
     </Compile>
+    <Page Include="Pages\Data_Import.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="UserControls\Ctrl_3DView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -253,10 +264,6 @@
       <Project>{6598a7cd-8f27-4d3f-a675-5ae63113a7c3}</Project>
       <Name>FreeImageDotNet</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\MUI\mui\1.0\FirstFloor.ModernUI\FirstFloor.ModernUI\FirstFloor.ModernUI.csproj">
-      <Project>{9a653a28-fe46-40e8-a14f-48b0e325165d}</Project>
-      <Name>FirstFloor.ModernUI</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\WFTools3D\WFTools3D\WFTools3D.csproj">
       <Project>{4f58d960-50f3-434f-b2b0-c9ed67151485}</Project>
       <Name>WFTools3D</Name>
@@ -274,6 +281,7 @@
   <ItemGroup>
     <Resource Include="UserControls\Poster.jpg" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

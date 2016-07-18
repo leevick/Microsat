@@ -19,13 +19,14 @@ using Microsat.Shared;
 using System.Threading;
 using System.Data;
 using Microsat.UserControls;
+using FirstFloor.ModernUI.Windows.Controls;
 
 namespace Microsat
 {
     /// <summary>
     /// MainWindow.xaml 的交互逻辑
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class MainWindow : ModernWindow
     {
         public MainWindow()
         {
